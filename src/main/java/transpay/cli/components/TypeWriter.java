@@ -16,7 +16,7 @@ public class TypeWriter {
                     case OPTION -> ConsoleLog.logOption(character);
                 }
 
-                Thread.sleep(0);
+                Thread.sleep(5);
             } catch (InterruptedException e) {
                 ConsoleLog.logError("TypeWriter aborted. Thread interrupted.");
                 e.printStackTrace();
@@ -44,7 +44,7 @@ public class TypeWriter {
                     case OPTION -> ConsoleLog.logOption(character);
                 }
 
-                Thread.sleep(0);
+                Thread.sleep(milliDelay);
             } catch (InterruptedException e) {
                 ConsoleLog.logError("TypeWriter aborted. Thread interrupted.");
                 e.printStackTrace();

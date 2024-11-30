@@ -42,7 +42,7 @@ public class ConsoleLog {
 
     public static void clear(int milliDelay) {
         try {
-            Thread.sleep(0);
+            Thread.sleep(milliDelay);
             new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
         } catch (InterruptedException | IOException e) {
             logError("Error clearing console");
@@ -79,7 +79,7 @@ public class ConsoleLog {
 
     public static void delay(int milliDelay) {
         try {
-            Thread.sleep(0);
+            Thread.sleep(milliDelay);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
