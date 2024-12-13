@@ -1,4 +1,4 @@
-package transpay.cli.pages;
+package transpay.cli.panel;
 
 import java.util.Scanner;
 
@@ -15,14 +15,16 @@ public class Login {
     private Account account;
 
     public Login() {
-        new FlashWriter(Log.HEADING, "Login to your Account\n", true);
+        new FlashWriter(Log.HEADING, "\t\t    Login to your Account\n", true);
         
-        new TypeWriter(Log.BODY, "If going here is a mistake, use 'exit' command\n", true);
+        new TypeWriter(Log.BODY, "    If going here was a mistake, use 'exit' command\n", true);
         
-        new TypeWriter(Log.BODY, "Enter your account number:", true);
+        new TypeWriter(Log.INPUT, "Enter your account number:", true);
         getAccountNumber();
 
-        new TypeWriter(Log.BODY, "Enter your 6-digit PIN:", true);
+        ConsoleLog.print("\n");
+
+        new TypeWriter(Log.INPUT, "Enter your 6-digit PIN (hidden for security):", true);
         getUserPIN();
 
         Transpay.account = account;
@@ -41,7 +43,7 @@ public class Login {
     private void getAccountNumber() {
         while (true) {
             try {
-                new FlashWriter(Log.BODY, ConsoleLog.inputPrompt, false);
+                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
                 String accountNumber = ConsoleLog.getInput(scan);
                 
                 account = Transpay.accountSystem.getAccount(accountNumber);
@@ -69,18 +71,18 @@ public class Login {
     private void getUserPIN() {
         while (true) {  
             try {
-                new FlashWriter(Log.BODY, ConsoleLog.inputPrompt, false);
-                PIN = ConsoleLog.getInput(scan);
+                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
+                PIN = ConsoleLog.getPassword(scan);
 
                 if (PIN.equalsIgnoreCase("exit")) {
                     ConsoleLog.clear(0);
                     new Welcome();
                     break;
                 }
-                else if (!PIN.trim().matches("\\d{6}")) {
+                else if (!PIN.matches("\\d{6}")) {
                     throw new NumberFormatException();
                 }
-                else if (!account.getPIN().equals(PIN.trim())) {
+                else if (!account.getPIN().equals(PIN)) {
                     new FlashWriter(Log.ERROR, "Incorrect PIN. Please try again.", true);
                     continue;
                 }

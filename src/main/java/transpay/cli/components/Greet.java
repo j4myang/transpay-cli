@@ -9,7 +9,7 @@ public class Greet {
     private Font font = new Font("Monospace", Font.BOLD, 12);
 
 
-    public Greet(String input, Color color) {
+    public Greet(String input) {
         BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
         Graphics g = img.getGraphics();
         g.setFont(font);

@@ -1,4 +1,4 @@
-package transpay.cli.pages;
+package transpay.cli.panel;
 
 import java.util.Date;
 import java.text.SimpleDateFormat;
@@ -15,30 +15,38 @@ import transpay.cli.components.TypeWriter;
 public class Deposit {
     private String PIN;
     private double limit = 100000.00;
+    public double multiple = 100.00;
     private double amount;
     private Scanner scan = Transpay.scan;
     private boolean back;
     private String date;
 
     public Deposit() {
-        new FlashWriter(Log.HEADING, "Deposit to your Account\n", true);
+        new FlashWriter(Log.HEADING, "\t\t    Deposit to your Account\n", true);
+        new TypeWriter(Log.BODY, "    If going here was a mistake, use 'exit' command\n", true);
 
-        new TypeWriter(Log.HEADING, "Deposit limit: PHP ", false);
-        new FlashWriter(Log.INFO, String.format("%,.2f\n", limit), true);
+        new TypeWriter(Log.BODY, "Deposit limit: PHP ", false);
+        new FlashWriter(Log.HEADING, String.format("%,.2f\n", limit), true);
 
-        new TypeWriter(Log.BODY, "Enter the amount you want to deposit:", true);
+        new TypeWriter(Log.BODY, "Deposit multiple: PHP ", false);
+        
+        new FlashWriter(Log.HEADING, String.format("%,.2f\n", multiple), true);
+
+        new TypeWriter(Log.INPUT, "Enter the amount you want to deposit:", true);
         getAmount();
 
-        new TypeWriter(Log.BODY, "Enter your 6-digit PIN:", true);
+        ConsoleLog.print("\n");
+
+        new TypeWriter(Log.INPUT, "Enter your 6-digit PIN (hidden for security):", true);
         getUserPIN();
 
         deposit();
 
-        new TypeWriter(Log.BODY, "\nPress enter to go back:", true);
+        new TypeWriter(Log.INPUT, "\nPress enter to go back:", true);
         goBack();
 
         if (back) {
-            new TypeWriter(Log.INFO, "\nReturning to Dashboard page...", true);
+            new FlashWriter(Log.INFO, "\nReturning to Dashboard page...", true);
 
             ConsoleLog.clear(1000);
 
@@ -49,16 +57,26 @@ public class Deposit {
     private void getAmount() {
         while (true) {
             try {
-                new FlashWriter(Log.BODY, ConsoleLog.inputPrompt + "PHP ", false);
+                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt + "PHP ", false);
                 String input = ConsoleLog.getInput(scan);
+                
+                if (input.equalsIgnoreCase("exit")) {
+                    new FlashWriter(Log.INFO, "\nReturning to Dashboard page...", true);
+
+                    ConsoleLog.clear(1000);
+        
+                    new Dashboard();
+                    return;
+                }
+                
                 amount = Double.valueOf(input);
-    
+
                 if (amount > limit) {
                     new FlashWriter(Log.ERROR, String.format("Amount exceed the limit of PHP %,.2f. Please try again.", limit), true);
                     continue;
                 }
-                else if (amount <= 0) {
-                    new FlashWriter(Log.ERROR, "Amount must be greater than PHP 0.00. Please try again.", true);
+                else if (amount % multiple != 0 || amount < multiple) {
+                    new FlashWriter(Log.ERROR, "Amount must be a multiple of PHP " + String.format("%,.2f", multiple) + ". Please try again.", true);
                     continue;
                 }
                 break;
@@ -72,13 +90,20 @@ public class Deposit {
     private void getUserPIN() {
         while (true) {  
             try {
-                new FlashWriter(Log.BODY, ConsoleLog.inputPrompt, false);
-                PIN = ConsoleLog.getInput(scan);
-    
-                if (!PIN.trim().matches("\\d{6}")) {
+                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
+                PIN = ConsoleLog.getPassword(scan);
+                
+                if (PIN.equalsIgnoreCase("exit")) {
+                    new FlashWriter(Log.INFO, "\nReturning to Dashboard page...", true);
+
+                    ConsoleLog.clear(1000);
+        
+                    new Dashboard();
+                }
+                else if (!PIN.matches("\\d{6}")) {
                     throw new NumberFormatException();
                 }
-                else if (!Transpay.account.getPIN().equals(PIN.trim())) {
+                else if (!Transpay.account.getPIN().equals(PIN)) {
                     new FlashWriter(Log.ERROR, "Incorrect PIN. Please try again.", true);
                     continue;
                 }
@@ -98,7 +123,8 @@ public class Deposit {
 
         Transpay.account.deposit(amount);
         Transpay.bankSystem.addTransaction(transaction);
-        
+        Transpay.totalDeposits += amount;
+
         new FlashWriter(Log.SUCCESS, "\nDeposit successful!\n", true);
 
         ConsoleLog.delay(1000);
@@ -111,7 +137,7 @@ public class Deposit {
     private void goBack() {
         while (true) {
             try {
-                new FlashWriter(Log.BODY, ConsoleLog.inputPrompt, false);
+                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
                 String input = ConsoleLog.getInput(scan);
                 
                 if (!input.isBlank()) {

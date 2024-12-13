@@ -8,12 +8,13 @@ public class TypeWriter {
             try {
                 switch (logType) {
                     case ERROR -> ConsoleLog.logError(character);
-                    case WARNING -> ConsoleLog.logWarning(character);
                     case SUCCESS -> ConsoleLog.logSuccess(character);
                     case INFO -> ConsoleLog.logInfo(character);
                     case BODY -> ConsoleLog.logBody(character);
                     case HEADING -> ConsoleLog.logHeading(character);
                     case OPTION -> ConsoleLog.logOption(character);
+                    case INPUT -> ConsoleLog.logInput(character);
+                    case SYSTEM -> ConsoleLog.logSystem(character);
                 }
 
                 Thread.sleep(5);
@@ -36,12 +37,13 @@ public class TypeWriter {
             try {
                 switch (logType) {
                     case ERROR -> ConsoleLog.logError(character);
-                    case WARNING -> ConsoleLog.logWarning(character);
                     case SUCCESS -> ConsoleLog.logSuccess(character);
                     case INFO -> ConsoleLog.logInfo(character);
                     case BODY -> ConsoleLog.logBody(character);
                     case HEADING -> ConsoleLog.logHeading(character);
                     case OPTION -> ConsoleLog.logOption(character);
+                    case INPUT -> ConsoleLog.logInput(character);
+                    case SYSTEM -> ConsoleLog.logSystem(character);
                 }
 
                 Thread.sleep(milliDelay);

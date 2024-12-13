@@ -1,4 +1,4 @@
-package transpay.cli.pages;
+package transpay.cli.panel;
 
 import java.util.Scanner;
 
@@ -15,26 +15,32 @@ public class AccountDetail {
     private boolean back = false;
 
     public AccountDetail() {
-        new FlashWriter(Log.HEADING, "Your Account\n", true);
+        new FlashWriter(Log.HEADING, "\t\t    Your Account\n", true);
 
         new TypeWriter(Log.BODY, "Account Number: ", false);
-        new FlashWriter(Log.INFO, Transpay.account.getAccountNumber(), true);
+        new FlashWriter(Log.HEADING, Transpay.account.getAccountNumber(), true);
 
         new TypeWriter(Log.BODY, "Account Name: ", false);
-        new FlashWriter(Log.INFO, Transpay.account.getName(), true);
+        new FlashWriter(Log.HEADING, Transpay.account.getName(), true);
 
         new TypeWriter(Log.BODY, "Balance: PHP ", false);
-        new FlashWriter(Log.INFO, String.format("%,.2f", Transpay.account.getBalance()), true);
+        new FlashWriter(Log.HEADING, String.format("%,.2f", Transpay.account.getBalance()), true);
 
         new TypeWriter(Log.BODY, "PIN: ", false);
-        new FlashWriter(Log.INFO, "*".repeat(Transpay.account.getPIN().length()), true);
+        new FlashWriter(Log.HEADING, "*".repeat(Transpay.account.getPIN().length()), true);
 
-        new TypeWriter(Log.BODY, "\n\nOptions", true);  
-        new FlashWriter(Log.OPTION, "1. View Transaction History", true);
-        new FlashWriter(Log.OPTION, "2. Show PIN", true);
-        new FlashWriter(Log.OPTION, "3. Go Back", true);
+        new TypeWriter(Log.SYSTEM, "\n\nOptions", true);  
 
-        new TypeWriter(Log.BODY, "\nWhat would you like to do?", true);
+        new TypeWriter(Log.OPTION, "1. ", false);
+        new FlashWriter(Log.BODY, "View transaction history", true);
+
+        new TypeWriter(Log.OPTION, "2. ", false);
+        new FlashWriter(Log.BODY, "Show PIN", true);
+
+        new TypeWriter(Log.OPTION, "3. ", false);
+        new FlashWriter(Log.BODY, "Go Back", true);
+
+        new TypeWriter(Log.INPUT, "\nWhat would you like to do?", true);
         getInput();
 
         switch (choice) {
@@ -52,7 +58,7 @@ public class AccountDetail {
         }
 
         if (back) {
-            new TypeWriter(Log.INFO, "\nReturning to Dashboard page...", true);
+            new FlashWriter(Log.INFO, "\nReturning to Dashboard page...", true);
             ConsoleLog.clear(1000);
             new Dashboard();
         }
@@ -61,7 +67,7 @@ public class AccountDetail {
     private void getInput() {
         while (true) {
             try {
-                new FlashWriter(Log.BODY, ConsoleLog.inputPrompt, false);
+                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
                 String input = ConsoleLog.getInput(scan);
 
                 if (!input.matches("\\d+")) {
@@ -87,7 +93,7 @@ public class AccountDetail {
     private void goBack() {
         while (true) {
             try {
-                new FlashWriter(Log.BODY, ConsoleLog.inputPrompt, false);
+                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
                 ConsoleLog.getInput(scan);
                 break;
             } catch (Exception e) {
@@ -101,8 +107,7 @@ public class AccountDetail {
 
     private void viewTransactionHistory() {
         while (true) {
-            new FlashWriter(Log.INFO, Transpay.account.getName(), true);
-            new FlashWriter(Log.HEADING, "Your Transaction History\n", true);
+            new FlashWriter(Log.HEADING, "\t\t    Your Transaction History\n", true);
     
             Transaction[] transactions = Transpay.bankSystem.getTransactionsByAccount(Transpay.account.getAccountNumber());
     
@@ -112,35 +117,55 @@ public class AccountDetail {
             else {
                 for (Transaction transaction : transactions) {
                     new TypeWriter(Log.BODY, "Transaction Date: ", false);
-                    new FlashWriter(Log.INFO, transaction.getDate(), true);
+                    new FlashWriter(Log.HEADING, transaction.getDate(), true);
     
                     new TypeWriter(Log.BODY, "Transaction Type: ", false);
-                    new FlashWriter(Log.INFO, transaction.getType(), true);
+                    new FlashWriter(Log.HEADING, transaction.getType(), true);
     
                     if (transaction.getTarget() != null) {
-                        new TypeWriter(Log.BODY, "Transferred to ", false);
-                        new FlashWriter(Log.INFO, transaction.getTarget(), true);
+                        new TypeWriter(Log.BODY, "Receiver Account: ", false);
+                        new FlashWriter(
+                            Log.HEADING, 
+                            transaction.getTarget().replace(
+                                transaction.getTarget().substring(
+                                    1, 
+                                    transaction.getTarget().length() - 3),
+                                "*".repeat(transaction.getTarget().length() - 3)),
+                     true);
                     }
     
-                    if (!transaction.getType().equals("Balance Inquiry")) {
-                        ConsoleLog.print("\t");
-                        new TypeWriter(Log.BODY, transaction.getType().equals("Withdrawal") ? "-" : "+", false);
-                        new FlashWriter(Log.INFO, String.format("PHP %,.2f", transaction.getAmount()), true);
-                    }
+                    ConsoleLog.print("\t");
 
+                    if (transaction.getType().equals("Withdrawal")) {
+                        new TypeWriter(Log.ERROR, "-", false);
+                    }
+                    else if (transaction.getType().equals("Deposit")) {
+                        new TypeWriter(Log.SUCCESS, "+", false);
+                    }
+                    else if (transaction.getType().equals("Transfer")) {
+                        new TypeWriter(Log.INFO, "~", false);
+                    }
+                    new TypeWriter(Log.BODY, "  PHP ", false);
+                    new FlashWriter(Log.HEADING, String.format("%,.2f", transaction.getAmount()), true);
+                
                     ConsoleLog.print("\n\n");
                 }
             }
     
-            new FlashWriter(Log.BODY, "\nPress enter to go back:", true);
+            new FlashWriter(Log.INPUT, "Press enter to go back:", true);
             goBack();
         }
     }
 
     private void showPIN() {
-        new FlashWriter(Log.INFO, "Your PIN is: " + Transpay.account.getPIN(), true);
+        new FlashWriter(Log.HEADING, "\t\t    " + Transpay.account.getName(), true);
+
+        ConsoleLog.print("\n");
         
-        new FlashWriter(Log.BODY, "Press enter to go back:", true);
+        new TypeWriter(Log.BODY, "Your PIN is: ", false);
+        new FlashWriter(Log.HEADING, Transpay.account.getPIN(), true);
+
+        new FlashWriter(Log.BODY, "\n\nPress enter to go back:", true);
         goBack();
     }
 }

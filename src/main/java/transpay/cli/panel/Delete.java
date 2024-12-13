@@ -1,4 +1,4 @@
-package transpay.cli.pages;
+package transpay.cli.panel;
 
 import java.util.Scanner;
 
@@ -16,20 +16,27 @@ public class Delete {
     public Delete() {
         new FlashWriter(Log.HEADING, "Delete your Account\n", true);
 
-        new TypeWriter(Log.BODY, "Are you sure you want to delete your account? (y/n)", true);
+        new TypeWriter(Log.INPUT, "Are you sure you want to delete your account? (y/n)", true);
         getInput(Transpay.scan);
 
-        new TypeWriter(Log.BODY, "Enter your 6-digit PIN:", true);
+        ConsoleLog.print("\n");
+
+        new TypeWriter(Log.INPUT, "Enter your 6-digit PIN (hidden for security):", true);
         getUserPIN();
 
         deleteAccount();
 
+        new FlashWriter(Log.INFO, "\nReturning to Welcome page...", true);
+
+        ConsoleLog.clear(1000);
+
+        new Welcome();
     }
 
     private void getInput(Scanner scan) {
         while (true) {
             try {
-                new FlashWriter(Log.BODY, ConsoleLog.inputPrompt, false);
+                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
                 choice = ConsoleLog.getInput(scan);
                 
                 if (choice.equalsIgnoreCase("y")) {
@@ -53,13 +60,13 @@ public class Delete {
     private void getUserPIN() {
         while (true) {  
             try {
-                new FlashWriter(Log.BODY, ConsoleLog.inputPrompt, false);
-                PIN = ConsoleLog.getInput(scan);
+                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
+                PIN = ConsoleLog.getPassword(scan);
     
-                if (!PIN.trim().matches("\\d{6}")) {
+                if (!PIN.matches("\\d{6}")) {
                     throw new NumberFormatException();
                 }
-                else if (!Transpay.account.getPIN().equals(PIN.trim())) {
+                else if (!Transpay.account.getPIN().equals(PIN)) {
                     new FlashWriter(Log.ERROR, "Incorrect PIN. Please try again.", true);
                     continue;
                 }

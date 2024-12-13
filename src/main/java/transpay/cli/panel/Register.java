@@ -1,4 +1,4 @@
-package transpay.cli.pages;
+package transpay.cli.panel;
 
 import java.util.Scanner;
 import java.util.UUID;
@@ -10,7 +10,7 @@ import transpay.cli.components.FlashWriter;
 import transpay.cli.components.Log;
 import transpay.cli.components.TypeWriter;
 
-public class Registration {
+public class Register {
     private String accountNumber;
     private String name;
     private String PIN;
@@ -19,41 +19,48 @@ public class Registration {
     private Scanner scan = Transpay.scan;
     private boolean back = false;
 
-    public Registration() {
-        new FlashWriter(Log.HEADING, "Register an Account\n", true);
+    public Register() {
+        new FlashWriter(Log.HEADING, "\t\t    Register an Account\n", true);
 
-        new TypeWriter(Log.BODY, "If going here is a mistake, use 'exit' command\n", true);
+        new TypeWriter(Log.SYSTEM, "    If going here was a mistake, use 'exit' command\n", true);
 
-        new TypeWriter(Log.BODY, "Enter your name:", true);
+        new TypeWriter(Log.INPUT, "Enter your name:", true);
         getUserName();
 
-        new TypeWriter(Log.BODY, "Enter your 6-digit PIN:", true);
+        ConsoleLog.print("\n");
+
+        new TypeWriter(Log.INPUT, "Enter your 6-digit PIN (hidden for security):", true);
         getUserPIN();
 
-        new TypeWriter(Log.BODY, "Confirm your 6-digit PIN:", true);
+        ConsoleLog.print("\n");
+
+        new TypeWriter(Log.INPUT, "Confirm your 6-digit PIN (hidden for security):", true);
         getConfirmUserPIN();
 
-        new TypeWriter(Log.BODY, "Enter your starting balance:", true);
+        ConsoleLog.print("\n");
+
+        new TypeWriter(Log.INPUT, "Enter your starting balance:", true);
         getStartingBalance();
 
         registerAccount();
 
-        new TypeWriter(Log.INFO, "\n\nPlease wait a moment while we prepare your account...\n\n", true);
+        new TypeWriter(Log.INFO, "\nPlease wait a moment while we prepare your account...\n", true);
 
         ConsoleLog.delay(1000);
 
-        new TypeWriter(Log.SUCCESS, "Account registration successful!\n\n", true);
+        new TypeWriter(Log.SUCCESS, "Account registration successful!\n", true);
 
-        new TypeWriter(Log.INFO, "Welcome aboard, " + name + "!\n", true);
+        ConsoleLog.clear(1000);
 
-        new TypeWriter(Log.HEADING, "\nAccount Summary\n", true);
+        new TypeWriter(Log.HEADING, "\t\t    Welcome aboard, " + name + "!\n", true);
+
         displaySummary();
 
-        new TypeWriter(Log.BODY, "\nPress enter to go back:", true);
+        new TypeWriter(Log.INPUT, "\nPress enter to go back:", true);
         goBack();
 
         if (back) {
-            new TypeWriter(Log.INFO, "\nReturning to Welcome page...", true);
+            new FlashWriter(Log.INFO, "\nReturning to Welcome page...", true);
 
             ConsoleLog.clear(1000);
 
@@ -65,7 +72,7 @@ public class Registration {
     private void getUserName() {
         while (true) {
             try {
-                new FlashWriter(Log.BODY, ConsoleLog.inputPrompt, false);
+                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
                 name = ConsoleLog.getInput(scan);
                 
                 if (name.equalsIgnoreCase("exit")) {
@@ -87,15 +94,15 @@ public class Registration {
     private void getUserPIN() {
         while (true) {  
             try {
-                new FlashWriter(Log.BODY, ConsoleLog.inputPrompt, false);
-                PIN = ConsoleLog.getInput(scan);
+                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
+                PIN = ConsoleLog.getPassword(scan);
 
                 if (PIN.equalsIgnoreCase("exit")) {
                     ConsoleLog.clear(0);
                     new Welcome();
                     break;
                 }
-                else if (!PIN.trim().matches("\\d{6}")) {
+                else if (!PIN.matches("\\d{6}")) {
                     throw new NumberFormatException();
                 }
                 if (PIN.length() != 6) {
@@ -114,16 +121,18 @@ public class Registration {
     private void getConfirmUserPIN() {
         while (true) {  
             try {
-                new FlashWriter(Log.BODY, ConsoleLog.inputPrompt, false);
-                confirmPIN = ConsoleLog.getInput(scan);
-                Integer.parseInt(confirmPIN);
-    
-                if (confirmPIN.length() != 6) {
-                    new FlashWriter(Log.ERROR, "PIN must be 6 digits long. Please try again.", true);
-                    continue;
+                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
+                confirmPIN = ConsoleLog.getPassword(scan);
+                
+                if (confirmPIN.equalsIgnoreCase("exit")) {
+                    ConsoleLog.clear(0);
+                    new Welcome();
+                    break;
                 }
-    
-                else if (!PIN.trim().equals(confirmPIN.trim())) {
+                else if (!confirmPIN.matches("\\d{6}")) {
+                    throw new NumberFormatException();
+                }
+                else if (!PIN.equals(confirmPIN)) {
                     new FlashWriter(Log.ERROR, "PINs do not match. Please try again.", true);
                     continue;
                 }
@@ -137,8 +146,15 @@ public class Registration {
     private void getStartingBalance() {
         while (true) {
             try {
-                new FlashWriter(Log.BODY, ConsoleLog.inputPrompt + "PHP ", false);
+                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt + "PHP ", false);
                 String input = ConsoleLog.getInput(scan);
+
+                if (input.equalsIgnoreCase("exit")) {
+                    ConsoleLog.clear(0);
+                    new Welcome();
+                    break;
+                }
+
                 balance = Double.valueOf(input);
     
                 if (balance > Double.MAX_VALUE) {
@@ -159,22 +175,22 @@ public class Registration {
 
     private void displaySummary() {
         new TypeWriter(Log.BODY, "Account Number: ", false);
-        new FlashWriter(Log.INFO, accountNumber, true);
+        new FlashWriter(Log.HEADING, accountNumber, true);
 
         new TypeWriter(Log.BODY, "Account Name: ", false);
-        new FlashWriter(Log.INFO, name, true);
+        new FlashWriter(Log.HEADING, name, true);
 
         new TypeWriter(Log.BODY, "PIN: ", false);
-        new FlashWriter(Log.INFO, PIN, true);
+        new FlashWriter(Log.HEADING, "*".repeat(PIN.length()), true);
 
         new TypeWriter(Log.BODY, "Balance: PHP ", false);
-        new FlashWriter(Log.INFO, String.format("%,.2f", balance), true);
+        new FlashWriter(Log.HEADING, String.format("%,.2f", balance), true);
     }
 
     private void goBack() {
         while (true) {
             try {
-                new FlashWriter(Log.BODY, ConsoleLog.inputPrompt, false);
+                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
                 ConsoleLog.getInput(scan);
                 back = true;
                 break;
@@ -190,7 +206,7 @@ public class Registration {
         }
         while (Transpay.accountSystem.getAccount(accountNumber) != null);
 
-       Account regAccount = new Account(accountNumber, PIN.trim(), balance, name);
+       Account regAccount = new Account(accountNumber, PIN, balance, name);
                
        Transpay.accountSystem.addAccount(regAccount);
     }

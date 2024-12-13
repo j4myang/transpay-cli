@@ -1,4 +1,4 @@
-package transpay.cli.pages;
+package transpay.cli.panel;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -22,27 +22,35 @@ public class Transfer {
     private String date;
 
     public Transfer() {
-        new FlashWriter(Log.HEADING, "Transfer to another Account\n", true);
+        new FlashWriter(Log.HEADING, "\t\t    Transfer to another Account\n", true);
+        new TypeWriter(Log.BODY, "    If going here was a mistake, use 'exit' command\n", true);
 
         new TypeWriter(Log.BODY, "Transfer limit: PHP ", false);
         new FlashWriter(Log.HEADING, String.format("%,.2f\n", limit), true);
 
-        new TypeWriter(Log.BODY, "Enter the account number you want to transfer to:", true);
+        new TypeWriter(Log.BODY, "Available balance: PHP ", false);
+        new FlashWriter(Log.HEADING, String.format("%,.2f\n\n", Transpay.account.getBalance()), true);
+        
+        new TypeWriter(Log.INPUT, "Enter the account number you want to transfer to:", true);
         getTargetAccountNumber();
 
-        new TypeWriter(Log.BODY, "Enter the amount you want to transfer:", true);
+        ConsoleLog.print("\n");
+
+        new TypeWriter(Log.INPUT, "Enter the amount you want to transfer:", true);
         getAmount();
 
-        new TypeWriter(Log.BODY, "Enter your 6-digit PIN:", true);
+        ConsoleLog.print("\n");
+
+        new TypeWriter(Log.INPUT, "Enter your 6-digit PIN (hidden for security):", true);
         getUserPIN();
 
         transfer();
 
-        new TypeWriter(Log.BODY, "\nPress enter to go back:", true);
+        new TypeWriter(Log.INPUT, "\nPress enter to go back:", true);
         goBack();
 
         if (back) {
-            new TypeWriter(Log.INFO, "\nReturning to Dashboard page...", true);
+            new FlashWriter(Log.INFO, "\nReturning to Dashboard page...", true);
 
             ConsoleLog.clear(1000);
 
@@ -53,12 +61,20 @@ public class Transfer {
     private void getTargetAccountNumber() {
         while (true) {  
             try {
-                new FlashWriter(Log.BODY, ConsoleLog.inputPrompt, false);
+                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
                 targetAccountNumber = ConsoleLog.getInput(scan);
     
                 if (targetAccountNumber.isBlank()) {
                     new FlashWriter(Log.ERROR, "Account number cannot be empty. Please try again.", true);
                     continue;
+                }
+                else if (targetAccountNumber.equalsIgnoreCase("exit")) {
+                    new FlashWriter(Log.INFO, "\nReturning to Dashboard page...", true);
+
+                    ConsoleLog.clear(1000);
+        
+                    new Dashboard();
+                    return;
                 }
                 else if (Transpay.accountSystem.getAccount(targetAccountNumber) == null) {
                     new FlashWriter(Log.ERROR, "Account number not found. Please try again.", true);
@@ -78,13 +94,27 @@ public class Transfer {
     private void getAmount() {
         while (true) {
             try {
-                new FlashWriter(Log.BODY, ConsoleLog.inputPrompt + "PHP ", false);
+                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt + "PHP ", false);
 
                 String input = ConsoleLog.getInput(scan);
+
+                if (input.equalsIgnoreCase("exit")) {
+                    new FlashWriter(Log.INFO, "\nReturning to Dashboard page...", true);
+
+                    ConsoleLog.clear(1000);
+        
+                    new Dashboard();
+                    return;
+                }
+                
                 amount = Double.valueOf(input);
-    
+                
                 if (amount > limit) {
                     new FlashWriter(Log.ERROR, String.format("Amount exceed the limit of PHP %,.2f. Please try again.", limit), true);
+                    continue;
+                }
+                else if (amount > Transpay.account.getBalance()) {
+                    new FlashWriter(Log.ERROR, "Insufficient balance. Please try again.", true);
                     continue;
                 }
                 else if (amount <= 0) {
@@ -101,13 +131,21 @@ public class Transfer {
     private void getUserPIN() {
         while (true) {  
             try {
-                new FlashWriter(Log.BODY, ConsoleLog.inputPrompt, false);
-                PIN = ConsoleLog.getInput(scan);
-    
-                if (!PIN.trim().matches("\\d{6}")) {
+                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
+                PIN = ConsoleLog.getPassword(scan);
+                
+                if (PIN.equalsIgnoreCase("exit")) {
+                    new FlashWriter(Log.INFO, "\nReturning to Dashboard page...", true);
+
+                    ConsoleLog.clear(1000);
+        
+                    new Dashboard();
+                    return;
+                }
+                else if (!PIN.matches("\\d{6}")) {
                     throw new NumberFormatException();
                 }
-                else if (!Transpay.account.getPIN().equals(PIN.trim())) {
+                else if (!Transpay.account.getPIN().equals(PIN)) {
                     new FlashWriter(Log.ERROR, "Incorrect PIN. Please try again.", true);
                     continue;
                 }
@@ -124,23 +162,25 @@ public class Transfer {
         date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         Transaction transaction = new Transaction(Transpay.account, amount, "Transfer", date);
         transaction.setTarget(targetAccountNumber);
+        double originalBalance = Transpay.account.getBalance();
 
         Transpay.account.transfer(Transpay.accountSystem.getAccount(targetAccountNumber), amount);
         Transpay.bankSystem.addTransaction(transaction);
+        Transpay.totalTransfers += amount;
 
         new FlashWriter(Log.SUCCESS, "\nTransfer successful!\n", true);
 
         ConsoleLog.delay(1000);
 
         if (Receipt.isReceipt()) {
-            new Receipt(Transpay.account.getBalance(), amount, transaction);
+            new Receipt(originalBalance, amount, transaction);
         }
     }
 
     private void goBack() {
         while (true) {
             try {
-                new FlashWriter(Log.BODY, ConsoleLog.inputPrompt, false);
+                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
                 String input = ConsoleLog.getInput(scan);
                 
                 if (!input.isBlank()) {
