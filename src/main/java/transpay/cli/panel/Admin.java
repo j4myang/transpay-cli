@@ -31,6 +31,12 @@ public class Admin {
         new TypeWriter(Log.SYSTEM, "Current Status: ", false);
         new FlashWriter(Log.HEADING, Transpay.status + "\n", true);
 
+        new TypeWriter(Log.SYSTEM, "Total Accounts: ", false);
+        new FlashWriter(Log.HEADING, String.format("%,d\n", Transpay.accountSystem.length()), true);
+
+        new TypeWriter(Log.SYSTEM, "Total Transactions: ", false);
+        new FlashWriter(Log.HEADING, String.format("%,d\n", Transpay.bankSystem.length()), true);
+
         new TypeWriter(Log.SYSTEM, "Total Circulated Funds: PHP ", false);
         new FlashWriter(Log.HEADING, String.format("%,.2f\n", Transpay.getTotalCirculatedFunds()), true);
 
@@ -44,6 +50,7 @@ public class Admin {
         new FlashWriter(Log.HEADING, String.format("%,.2f", Transpay.totalTransfers), true);
 
         new TypeWriter(Log.SYSTEM, "\nActions\n", true);
+
         new TypeWriter(Log.OPTION, "1. ", false);
         new FlashWriter(Log.BODY, "Fix", true);
 
@@ -98,6 +105,7 @@ public class Admin {
                         ConsoleLog.delay(1000);
                     }
                 }
+
                 else if (input.equals("2")) {
                     new Welcome();
                     break;

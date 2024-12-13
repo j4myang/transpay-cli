@@ -57,4 +57,14 @@ public class BankSystem {
             current = current.getPointer();
         }
     }
+
+    public int length() {
+        BankTransaction current = head;
+        int count = 0;
+        while (current != null) {
+            count++;
+            current = current.getPointer();
+        }
+        return count;
+    }
 }

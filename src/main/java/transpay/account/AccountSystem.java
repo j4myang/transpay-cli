@@ -63,11 +63,13 @@ public class AccountSystem {
         }
     }
 
-    public void printAccounts() {
+    public int length() {
         RegisteredAccount current = head;
+        int count = 0;
         while (current != null) {
-            System.out.println(current.getAccount());
+            count++;
             current = current.getPointer();
         }
+        return count;
     }
 }
