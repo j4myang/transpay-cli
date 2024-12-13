@@ -2,7 +2,7 @@
 
 A banking system application
 
-## Decription
+## Description
 
 A banking system application that is assigned as a project in our Data Structure and Algorithm 
 subject which aims to assess our skills in data structures, specifically Linked List. 
