@@ -1,14 +1,11 @@
 package transpay.account;
 
-
-
 public class AccountSystem {
     private RegisteredAccount head;
 
     public AccountSystem() {
         this.head = null;
     }
-    
 
     public void addAccount(Account account) {
         RegisteredAccount registeredAccount = new RegisteredAccount(account);

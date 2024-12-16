@@ -10,204 +10,137 @@ import transpay.cli.components.Log;
 import transpay.cli.components.TypeWriter;
 
 public class Register {
-    private String accountNumber;
-    private String name;
-    private String PIN;
-    private String confirmPIN;
-    private double balance;
-    private boolean back = false;
-
     public Register() {
         new FlashWriter(Log.HEADING, "\t\t    Register an Account\n", true);
 
         new TypeWriter(Log.SYSTEM, "    If going here was a mistake, use 'exit' command\n", true);
 
         new TypeWriter(Log.INPUT, "Enter your name:", true);
-        getUserName();
+        String username = getUserName();
+        String pin = getUserPIN();
+        getConfirmUserPIN(pin);
+        double balance = getStartingBalance();
 
-        ConsoleLog.print("\n");
-
-        new TypeWriter(Log.INPUT, "Enter your 6-digit PIN (hidden for security):", true);
-        getUserPIN();
-
-        ConsoleLog.print("\n");
-
-        new TypeWriter(Log.INPUT, "Confirm your 6-digit PIN (hidden for security):", true);
-        getConfirmUserPIN();
-
-        ConsoleLog.print("\n");
-
-        new TypeWriter(Log.INPUT, "Enter your starting balance:", true);
-        getStartingBalance();
-
-        registerAccount();
-
-        new TypeWriter(Log.INFO, "\nPlease wait a moment while we prepare your account...\n", true);
-
+        new FlashWriter(Log.INFO, "\nPlease wait a moment while we prepare your account...\n", true);
+        
         ConsoleLog.delay(1000);
+
+        String accountNumber = registerAccount(username, pin, balance);
 
         new TypeWriter(Log.SUCCESS, "Account registration successful!\n", true);
 
         ConsoleLog.clear(1000);
 
-        new TypeWriter(Log.HEADING, "\t\t    Welcome aboard, " + name + "!\n", true);
+        displaySummary(accountNumber, username, pin, balance);
 
-        displaySummary();
-
-        new TypeWriter(Log.INPUT, "\nPress enter to go back:", true);
-        goBack();
-
-        if (back) {
-            new FlashWriter(Log.INFO, "\nReturning to Welcome page...", true);
-
-            ConsoleLog.clear(1000);
-
-            new Welcome();
-        }
+        Welcome.returnToWelcome();
     }
 
 
-    private void getUserName() {
+    private String getUserName() {
         while (true) {
-            try {
-                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                name = ConsoleLog.getInput();
-                
-                if (name.equalsIgnoreCase("exit")) {
-                    ConsoleLog.clear(0);
-                    new Welcome();
-                    break;
-                }
-                else if (name.isBlank()) {
-                    new FlashWriter(Log.ERROR, "Name cannot be empty. Please try again.", true);
-                    continue;
-                }
-                break;
-            } catch (Exception e) {
-                new FlashWriter(Log.ERROR, "Invalid input. Please try again.", true);
+            String input = Welcome.getValidatedInput(
+                "", 
+                test -> {
+                    return !test.isBlank();
+                },
+                "Name cannot be empty. Please try again.",
+                false);
+        
+            if (input != null) {
+                return input;
             }
         }
     }
 
-    private void getUserPIN() {
-        while (true) {  
-            try {
-                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                PIN = ConsoleLog.getPassword();
+    private String getUserPIN() {
+        new TypeWriter(Log.INPUT, "\nEnter your 6-digit PIN (hidden for security):", true);
 
-                if (PIN.equalsIgnoreCase("exit")) {
-                    ConsoleLog.clear(0);
-                    new Welcome();
-                    break;
-                }
-                else if (!PIN.matches("\\d{6}")) {
-                    throw new NumberFormatException();
-                }
-                if (PIN.length() != 6) {
-                    new FlashWriter(Log.ERROR, "PIN must be 6 digits long. Please try again.", true);
-                    continue;
-                }
-                break;
-            } catch (NumberFormatException e) {
-                new FlashWriter(Log.ERROR, "PIN must be numeric and 6 digits long. Please try again.", true);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void getConfirmUserPIN() {
-        while (true) {  
-            try {
-                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                confirmPIN = ConsoleLog.getPassword();
-                
-                if (confirmPIN.equalsIgnoreCase("exit")) {
-                    ConsoleLog.clear(0);
-                    new Welcome();
-                    break;
-                }
-                else if (!confirmPIN.matches("\\d{6}")) {
-                    throw new NumberFormatException();
-                }
-                else if (!PIN.equals(confirmPIN)) {
-                    new FlashWriter(Log.ERROR, "PINs do not match. Please try again.", true);
-                    continue;
-                }
-                break;
-            } catch (NumberFormatException e) {
-                new FlashWriter(Log.ERROR, "PIN must be numeric and 6 digits long. Please try again.", true);
-            } catch (Exception e) {
-                new FlashWriter(Log.ERROR, "Invalid input. Please try again.", true);
-            }
-        }
-    }
-
-    private void getStartingBalance() {
         while (true) {
-            try {
-                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt + "PHP ", false);
-                String input = ConsoleLog.getInput();
+            String input = Welcome.getValidatedInput(
+                "", 
+                test -> {
+                    return test.matches(Transpay.pinPattern);
+                }, "PIN must be numeric and 6 digits long. Please try again.", true);
+           
+            if (input != null) {
+                return input;
+           }
+        }
+    }
 
-                if (input.equalsIgnoreCase("exit")) {
-                    ConsoleLog.clear(0);
-                    new Welcome();
-                    break;
-                }
+    private void getConfirmUserPIN(String pin) {
+        new TypeWriter(Log.INPUT, "\nConfirm your 6-digit PIN (hidden for security):", true);
 
-                balance = Double.valueOf(input);
-    
-                if (balance > Double.MAX_VALUE) {
-                    new FlashWriter(Log.ERROR, "Amount is too large. Please try again.", true);
-                    continue;
-                }
-    
-                else if (balance <= 0) {
-                    new FlashWriter(Log.ERROR, "Amount must be greater than PHP 0.00. Please try again.", true);
-                    continue;
-                }
+        while (true) {
+            String input = Welcome.getValidatedInput(
+                "", 
+                test1 -> {
+                    return test1.matches(Transpay.pinPattern);
+                }, 
+                test2 -> {
+                    return test2.equals(pin);
+                }, 
+                "PIN must be numeric and 6 digits long. Please try again.", 
+                "PINs do not match. Please try again.", 
+                true);
+
+            if (input != null) {
                 break;
-            } catch (Exception e) {
-                new FlashWriter(Log.ERROR, "Invalid input. Please try again.", true);
+            }
+        }
+    }
+
+    private double getStartingBalance() {
+        new TypeWriter(Log.INPUT, "\nEnter your starting balance (balance limit of 1 million):", true);
+
+        while (true) {
+            String input = Welcome.getValidatedInput(
+                "PHP ", 
+                test1 -> {
+                    return Double.parseDouble(test1) > 0;
+                }, 
+                test2 -> {
+                    return Double.parseDouble(test2) <= 1000000.00;
+                }, 
+                "Amount must be greater than PHP 0.00. Please try again.",
+                "Amount exceeded the limit. Please try again.",
+                false
+                );
+            
+            if (input != null) {
+                return Double.parseDouble(input);
             }
         }
     } 
 
-    private void displaySummary() {
+    private void displaySummary(String accountNumber, String username, String pin, double balance) {
+        new TypeWriter(Log.HEADING, "\t\t    Welcome aboard, " + username + "!\n", true);
+
         new TypeWriter(Log.BODY, "Account Number: ", false);
         new FlashWriter(Log.HEADING, accountNumber, true);
 
         new TypeWriter(Log.BODY, "Account Name: ", false);
-        new FlashWriter(Log.HEADING, name, true);
+        new FlashWriter(Log.HEADING, username, true);
 
         new TypeWriter(Log.BODY, "PIN: ", false);
-        new FlashWriter(Log.HEADING, "*".repeat(PIN.length()), true);
+        new FlashWriter(Log.HEADING, "*".repeat(pin.length()), true);
 
         new TypeWriter(Log.BODY, "Balance: PHP ", false);
         new FlashWriter(Log.HEADING, String.format("%,.2f", balance), true);
     }
 
-    private void goBack() {
-        while (true) {
-            try {
-                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                ConsoleLog.getInput();
-                back = true;
-                break;
-            } catch (Exception e) {
-                new FlashWriter(Log.ERROR, "Invalid input. Please try again.", true);
-            }
-        }
-    }
+    private String registerAccount(String name, String pin, double balance) {
+        String accountNumber = "";
 
-    private void registerAccount() {
         do {
             accountNumber = UUID.randomUUID().toString().split("-")[0];
         }
         while (Transpay.accountSystem.getAccount(accountNumber) != null);
 
-       Account regAccount = new Account(accountNumber, PIN, balance, name);
+       Account regAccount = new Account(accountNumber, pin, balance, name);
                
        Transpay.accountSystem.addAccount(regAccount);
+       return accountNumber;
     }
 }

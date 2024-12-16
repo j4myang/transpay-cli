@@ -12,12 +12,8 @@ import transpay.cli.components.Receipt;
 import transpay.cli.components.TypeWriter;
 
 public class Balance {
-    private int choice;
-    private String date;
-    
-
     public Balance() {
-        date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         Transaction transaction = new Transaction(Transpay.account, 0, "Balance Inquiry", date);
 
         new FlashWriter(Log.BODY, "Your account balance is: ", false);
@@ -50,74 +46,51 @@ public class Balance {
         new TypeWriter(Log.OPTION, "4. ", false);
         new FlashWriter(Log.BODY, "Go Back", true);
 
+        handleAction();
+    }
+
+    public void handleAction() {
         new TypeWriter(Log.INPUT, "\nWhat would you like to do?", true);
 
         while (true) {
-            getInput();
+            int action = Integer.parseInt(Dashboard.getValidatedInput(
+                "", 
+                test -> {
+                    try {
+                        if (!test.matches("\\d+")) {
+                            throw new NumberFormatException();
+                        }
+    
+                        int temp = Integer.parseInt(test);
+                        
+                        return temp >= 1 && temp <= 4;
+                    } catch (NumberFormatException e) {
+                        return false;
+                }}, 
+                "Invalid choice. Please try again.",
+                false 
+                ));
 
-            switch (choice) {
+            if ((action >= 1 && action <= 3) && Transpay.status.equals("Under Maintenance")) {
+                new FlashWriter(Log.ERROR, "The system is currently Under Maintenance. Please try again later.", true);
+                continue;
+            }
+        
+            switch (action) {
                 case 1:
-                    if (Transpay.status.equals("Under Maintenance")) {
-                        new FlashWriter(Log.ERROR, "The system is currently Under Maintenance. Please try again later.", true);
-                        continue;
-                    }
-                    else {
-                        new FlashWriter(Log.INFO, "\nRedirecting to Withdraw page...", true);
-                        ConsoleLog.clear(1000);
-                        new Withdraw();
-                        break;
-                    }
+                    Withdraw.redirectToWithdraw();
+                    break;
                 case 2:
-                    if (Transpay.status.equals("Under Maintenance")) {
-                        new FlashWriter(Log.ERROR, "The system is currently Under Maintenance. Please try again later.", true);
-                        continue;
-                    }
-                    else {
-                        new FlashWriter(Log.INFO, "\nRedirecting to Deposit page...", true);
-                        ConsoleLog.clear(1000);
-                        new Deposit();
-                        break;
-                    }
+                    Deposit.redirectToDeposit();
+                    break;
                 case 3:
-                    if (Transpay.status.equals("Under Maintenance")) {
-                        new FlashWriter(Log.ERROR, "The system is currently Under Maintenance. Please try again later.", true);
-                        continue;
-                    }
-                    else {
-                        new FlashWriter(Log.INFO, "\nRedirecting to Transfer page...", true);
-                        ConsoleLog.clear(1000);
-                        new Transfer();
-                        break;
-                    }
+                    Transfer.redirectToTransfer();
+                    break;
                 case 4:
-                    new FlashWriter(Log.INFO, "\nReturning to Dashboard page...", true);
+                    new FlashWriter(Log.INFO, "Returning to Dashboard...", false);
                     ConsoleLog.clear(1000);
                     new Dashboard();
                     break;
-            }    
-        } 
-    }
-
-    public void getInput() {
-        while (true) {
-            try {
-                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                String input = ConsoleLog.getInput();
-
-                if (!input.matches("\\d+")) {
-                    throw new NumberFormatException();
-                }
-
-                choice = Integer.parseInt(input);
-
-                if (choice >=1 && choice <= 4) {
-                    break;
-                }
-                else {
-                    new FlashWriter(Log.ERROR, "Invalid choice. Please try again.", true);
-                }
-            } catch (Exception e) {
-                new FlashWriter(Log.ERROR, "Invalid input. Please try again.", true);
             }
         }
     }

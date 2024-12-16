@@ -99,7 +99,7 @@ public class Admin {
                         new FlashWriter(Log.INFO, "\nFixing the system...", true);
                         ConsoleLog.delay(1500);
                         Transpay.status = "Online";
-                        new FlashWriter(Log.SUCCESS, "\nThe system is now online!", true);
+                        new TypeWriter(Log.SUCCESS, "\nThe system is now online!", true);
                         ConsoleLog.delay(1000);
                     }
                 }

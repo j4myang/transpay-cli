@@ -12,118 +12,53 @@ import transpay.cli.components.Receipt;
 import transpay.cli.components.TypeWriter;
 
 public class Withdraw {
-    public String accountNumber;
-    public String PIN;
-    public double amount;
-    public double limit = 100000.00;
-    public double multiple = 100.00;
-    private boolean back;
-    private String date;
-
     public Withdraw() {
+        displayWithdrawPage();
+        double amount = getAmount();    
+        Dashboard.getUserPIN();
+        processWithdraw(amount);
+        Dashboard.returnToDashboard();
+    }
+
+    private void displayWithdrawPage() {
         new FlashWriter(Log.HEADING, "\t\t    Withdraw from your Account\n", true);
         new TypeWriter(Log.SYSTEM, "    If going here was a mistake, use 'exit' command\n", true);
         
         new TypeWriter(Log.BODY, "Withdrawal limit: PHP ", false);
-        new FlashWriter(Log.HEADING, String.format("%,.2f\n", limit), true);
+        new FlashWriter(Log.HEADING, String.format("%,.2f\n", Transpay.depositLimit), true);
         
         new TypeWriter(Log.BODY, "Withdrawal multiple: PHP ", false);
-        new FlashWriter(Log.HEADING, String.format("%,.2f\n", multiple), true);
+        new FlashWriter(Log.HEADING, String.format("%,.2f\n", Transpay.depositMultiple), true);
 
         new TypeWriter(Log.BODY, "Available balance: PHP ", false);
         new FlashWriter(Log.HEADING, String.format("%,.2f\n\n", Transpay.account.getBalance()), true);
+    }
 
+    private double getAmount() {
         new TypeWriter(Log.INPUT, "Enter the amount you want to withdraw:", true);
-        getAmount();    
 
-        ConsoleLog.print("\n");
-
-        new TypeWriter(Log.INPUT, "Enter your 6-digit PIN (hidden for security):", true);
-        getUserPIN();
-
-        withdraw();
-
-        new TypeWriter(Log.INPUT, "\nPress enter to go back:", true);
-        goBack();
-
-        if (back) {
-            new FlashWriter(Log.INFO, "\nReturning to Dashboard page...", true);
-
-            ConsoleLog.clear(1000);
-
-            new Dashboard();
-        }
-    }
-
-    private void getAmount() {
         while (true) {
-            try {
-                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt + "PHP ", false);
-
-                String input = ConsoleLog.getInput();
-
-                if (input.equalsIgnoreCase("exit")) {
-                    new FlashWriter(Log.INFO, "\nReturning to Dashboard page...", true);
-
-                    ConsoleLog.clear(1000);
-        
-                    new Dashboard();
-                    return;
-                }
-
-                amount = Double.valueOf(input);
-                
-                if (amount > limit) {
-                    new FlashWriter(Log.ERROR, String.format("Amount exceed the limit of PHP %,.2f. Please try again.", limit), true);
-                    continue;
-                }
-                else if (amount % multiple != 0 || amount < multiple) {
-                    new FlashWriter(Log.ERROR, "Amount must be a multiple of PHP " + String.format("%,.2f", multiple) + ". Please try again.", true);
-                    continue;
-                }
-                else if (amount > Transpay.account.getBalance()) {
-                    new FlashWriter(Log.ERROR, "Insufficient balance. Please try again.", true);
-                    continue;
-                }
-                break;
-            } catch (Exception e) {
-                new FlashWriter(Log.ERROR, "Invalid input. Please try again.", true);
+            String input = Dashboard.getValidatedInput(
+                "PHP ",
+                 test1 -> {
+                    return Double.parseDouble(test1) <= Transpay.account.getBalance();
+                 }, 
+                 test2 -> {
+                    double temp = Double.parseDouble(test2);
+                    return temp > 0 && temp <= Transpay.depositLimit && temp % Transpay.depositMultiple == 0;
+                 }, 
+                 "Insufficient account balance. Please try again.",
+                 "Amount must be positive, within the withdrawal limit, and a multiple of PHP " + String.format("%,.2f", Transpay.depositMultiple) + ". Please try again.",
+                   false);
+            
+            if (input != null) {
+                return Double.parseDouble(input);
             }
         }
     }
 
-    private void getUserPIN() {
-        while (true) {  
-            try {
-                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                PIN = ConsoleLog.getPassword();
-                
-                if (PIN.equalsIgnoreCase("exit")) {
-                    new FlashWriter(Log.INFO, "\nReturning to Dashboard page...", true);
-
-                    ConsoleLog.clear(1000);
-        
-                    new Dashboard();
-                    return;
-                }
-                else if (!PIN.matches("\\d{6}")) {
-                    throw new NumberFormatException();
-                }
-                else if (!Transpay.account.getPIN().equals(PIN)) {
-                    new FlashWriter(Log.ERROR, "Incorrect PIN. Please try again.", true);
-                    continue;
-                }
-                break;
-            } catch (NumberFormatException e) {
-                new FlashWriter(Log.ERROR, "PIN must be numeric and 6 digits long. Please try again.", true);
-            } catch (Exception e) {
-                new FlashWriter(Log.ERROR, "Invalid input. Please try again.", true);
-            }
-        }
-    }
-
-    private void withdraw() {
-        date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+    private void processWithdraw(double amount) {
+        String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         double originalBalance = Transpay.account.getBalance();
         Transaction transaction = new Transaction(Transpay.account, amount, "Withdrawal", date);
 
@@ -131,7 +66,7 @@ public class Withdraw {
         Transpay.bankSystem.addTransaction(transaction);
         Transpay.totalWithdrawals += amount;
         
-        new FlashWriter(Log.SUCCESS, "\nWithdrawal successful!\n", true);
+        new TypeWriter(Log.SUCCESS, "\nWithdrawal successful!\n", true);
         
         ConsoleLog.delay(1000);
 
@@ -139,17 +74,10 @@ public class Withdraw {
             new Receipt(originalBalance, amount, transaction);
         }
     }
-   
-    private void goBack() {
-        while (true) {
-            try {
-                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                ConsoleLog.getInput();
-                back = true;
-                break;
-            } catch (Exception e) {
-                new FlashWriter(Log.ERROR, "Invalid input. Please try again.", true);
-            }
-        }
+
+    public static void redirectToWithdraw() {
+        new FlashWriter(Log.INFO, "Redirecting to Withdraw...", false);
+        ConsoleLog.clear(1000);
+        new Withdraw();
     }
 }

@@ -8,10 +8,13 @@ import transpay.cli.components.Log;
 import transpay.cli.components.TypeWriter;
 
 public class AccountDetail {
-    private int choice;
-    private boolean back = false;
-
     public AccountDetail() {
+
+        displayAccountDetailPage();
+        handleAction();
+    }
+
+    private void displayAccountDetailPage() {
         new FlashWriter(Log.HEADING, "\t\t    Your Account\n", true);
 
         new TypeWriter(Log.BODY, "Account Number: ", false);
@@ -37,69 +40,41 @@ public class AccountDetail {
         new TypeWriter(Log.OPTION, "3. ", false);
         new FlashWriter(Log.BODY, "Go Back", true);
 
+    }
+
+    private void handleAction() {
         new TypeWriter(Log.INPUT, "\nWhat would you like to do?", true);
-        getInput();
 
-        switch (choice) {
-            case 1:
-                ConsoleLog.clear(0);
-                viewTransactionHistory();
-                break;
-            case 2:
-                ConsoleLog.clear(0);
-                showPIN();
-                break;
-            case 3:
-                back = true;
-                break;
-        }
-
-        if (back) {
-            new FlashWriter(Log.INFO, "\nReturning to Dashboard page...", true);
-            ConsoleLog.clear(1000);
-            new Dashboard();
-        }
-    }
-
-    private void getInput() {
         while (true) {
-            try {
-                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                String input = ConsoleLog.getInput();
+            int action = Integer.parseInt(Dashboard.getValidatedInput("", test -> {
+                try {
+                    if (!test.matches("\\d+")) {
+                        throw new NumberFormatException();
+                    }
 
-                if (!input.matches("\\d+")) {
-                    throw new NumberFormatException();
-                }
+                    int temp = Integer.parseInt(test);
+                    
+                    return temp >= 1 && temp <= 3;
+                } catch (NumberFormatException e) {
+                    return false;
+            }}, "Invalid choice. Please try again.", false));
 
-                choice = Integer.parseInt(input);
-
-                if (choice >= 1 && choice <= 3) {
+            switch (action) {
+                case 1:
+                    ConsoleLog.clear(0);
+                    viewTransactionHistory();
                     break;
-                }
-                else {
-                    new FlashWriter(Log.ERROR, "Invalid choice. Please try again.", true);
-                }
-            } catch (NumberFormatException e) {
-                new FlashWriter(Log.ERROR, "Invalid input. Please try again.", true);
-            } catch (Exception e) {
-                e.printStackTrace();
+                case 2:
+                    ConsoleLog.clear(0);
+                    showPIN();
+                    break;
+                case 3:
+                    new FlashWriter(Log.INFO, "Returning to Dashboard...", false);
+                    ConsoleLog.clear(1000);
+                    new Dashboard();
+                    break;
             }
         }
-    }
-
-    private void goBack() {
-        while (true) {
-            try {
-                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                ConsoleLog.getInput();
-                break;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        ConsoleLog.clear(0);
-        new AccountDetail();
     }
 
     private void viewTransactionHistory() {
@@ -148,9 +123,8 @@ public class AccountDetail {
                     ConsoleLog.print("\n\n");
                 }
             }
-    
-            new FlashWriter(Log.INPUT, "Press enter to go back:", true);
-            goBack();
+            
+            returnToAccountDetail();
         }
     }
 
@@ -162,7 +136,18 @@ public class AccountDetail {
         new TypeWriter(Log.BODY, "Your PIN is: ", false);
         new FlashWriter(Log.HEADING, Transpay.account.getPIN(), true);
 
+        returnToAccountDetail();
+    }
+
+    private void returnToAccountDetail() {
         new FlashWriter(Log.INPUT, "\n\nPress enter to go back:", true);
-        goBack();
+        new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
+        ConsoleLog.getInput();
+
+        new FlashWriter(Log.INFO, "Returning to Account Detail...", false);
+        ConsoleLog.clear(1000);
+
+        new AccountDetail();
+        return;
     }
 }

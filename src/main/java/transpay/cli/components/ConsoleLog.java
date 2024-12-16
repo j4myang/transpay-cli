@@ -12,37 +12,45 @@ public class ConsoleLog {
     private static PrintStream out = System.out;
     private static PrintStream err = System.err;
     public static final String inputPrompt = ">_ ";
+    public static final String colorHeading = String.format(CUSTOM_COLOR_CODE, 245, 227, 92);
+    public static final String colorBody = String.format(CUSTOM_COLOR_CODE, 249, 249, 252);
+    public static final String colorSystem = String.format(CUSTOM_COLOR_CODE, 210, 197, 185);
+    public static final String colorInfo = String.format(CUSTOM_COLOR_CODE, 95, 192, 182);
+    public static final String colorOption = String.format(CUSTOM_COLOR_CODE, 31, 121, 178);
+    public static final String colorInput = String.format(CUSTOM_COLOR_CODE, 250, 182, 194);
+    public static final String colorSuccess = String.format(CUSTOM_COLOR_CODE, 178, 220, 103);
+    public static final String colorError = String.format(CUSTOM_COLOR_CODE, 247, 70, 50);
 
     public static void logHeading(String text) {
-        out.print(String.format(CUSTOM_COLOR_CODE, 183, 166, 76) + text + RESET_CODE);
+        out.print(colorHeading + text + RESET_CODE);
     }
 
     public static void logBody(String text) {
-        out.print(String.format(CUSTOM_COLOR_CODE, 221, 225, 226) + text + RESET_CODE);
+        out.print(colorBody + text + RESET_CODE);
     }
 
     public static void logSystem(String text) {
-        out.print(String.format(CUSTOM_COLOR_CODE, 192, 193, 185) + text + RESET_CODE);
+        out.print(colorSystem + text + RESET_CODE);
     }
 
     public static void logInfo(String text) {
-        out.print(String.format(CUSTOM_COLOR_CODE, 160, 146, 179) + text + RESET_CODE);
+        out.print(colorInfo + text + RESET_CODE);
     }
 
     public static void logOption(String text) {
-        out.print(String.format(CUSTOM_COLOR_CODE, 198, 167, 183) + text + RESET_CODE);
+        out.print(colorOption + text + RESET_CODE);
     }
 
     public static void logInput(String text) {
-        out.print(String.format(CUSTOM_COLOR_CODE, 112, 137, 159) + text + RESET_CODE);
+        out.print(colorInput + text + RESET_CODE);
     }
     
     public static void logSuccess(String text) {
-        out.print(String.format(CUSTOM_COLOR_CODE, 120, 150, 96) + text + RESET_CODE);
+        out.print(colorSuccess + text + RESET_CODE);
     }
 
     public static void logError(String text) {
-        err.print(String.format(CUSTOM_COLOR_CODE, 179, 96, 116) + text + RESET_CODE);
+        err.print(colorError + text + RESET_CODE);
     }
 
     public static void clear(int milliDelay) {
