@@ -1,7 +1,5 @@
 package transpay.cli.panel;
 
-import java.util.Scanner;
-
 import transpay.cli.Transpay;
 import transpay.cli.components.ConsoleLog;
 import transpay.cli.components.FlashWriter;
@@ -11,13 +9,12 @@ import transpay.cli.components.TypeWriter;
 public class Delete {
     private String choice;
     private String PIN;
-    private Scanner scan = Transpay.scan;
     
     public Delete() {
         new FlashWriter(Log.HEADING, "Delete your Account\n", true);
 
         new TypeWriter(Log.INPUT, "Are you sure you want to delete your account? (y/n)", true);
-        getInput(Transpay.scan);
+        getInput();
 
         ConsoleLog.print("\n");
 
@@ -33,11 +30,11 @@ public class Delete {
         new Welcome();
     }
 
-    private void getInput(Scanner scan) {
+    private void getInput() {
         while (true) {
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                choice = ConsoleLog.getInput(scan);
+                choice = ConsoleLog.getInput();
                 
                 if (choice.equalsIgnoreCase("y")) {
                     break;
@@ -61,7 +58,7 @@ public class Delete {
         while (true) {  
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                PIN = ConsoleLog.getPassword(scan);
+                PIN = ConsoleLog.getPassword();
     
                 if (!PIN.matches("\\d{6}")) {
                     throw new NumberFormatException();

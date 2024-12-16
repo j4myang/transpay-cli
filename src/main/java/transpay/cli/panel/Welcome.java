@@ -1,7 +1,5 @@
 package transpay.cli.panel;
 
-import java.util.Scanner;
-
 import transpay.cli.Transpay;
 import transpay.cli.components.ConsoleLog;
 import transpay.cli.components.FlashWriter;
@@ -11,12 +9,12 @@ import transpay.cli.components.TypeWriter;
 
 public class Welcome {
     private int choice;
-    private Scanner scan = Transpay.scan;
+    
     
     public Welcome() {
-        new Greet("TRANSPAY");
+        new Greet(Transpay.brand.toUpperCase());
 
-        new TypeWriter(Log.HEADING, "\t\t    Welcome to Transpay!", true);
+        new TypeWriter(Log.HEADING, "\t\t    Welcome to " + Transpay.brand + "!", true);
         new TypeWriter(Log.SYSTEM, "\t       Your trustworthy banking system\n", true);
 
         new TypeWriter(Log.SYSTEM, "Current Status: ", false);
@@ -44,7 +42,7 @@ public class Welcome {
         while (true) {
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                String input = ConsoleLog.getInput(scan);
+                String input = ConsoleLog.getInput();
                 choice = Integer.parseInt(input);
                 
                 if (Transpay.status.equals("Offline") && (choice == 1 || choice == 2)) {

@@ -1,7 +1,5 @@
 package transpay.cli.panel;
 
-import java.util.Scanner;
-
 import transpay.bank.Transaction;
 import transpay.cli.Transpay;
 import transpay.cli.components.ConsoleLog;
@@ -11,7 +9,6 @@ import transpay.cli.components.TypeWriter;
 
 public class AccountDetail {
     private int choice;
-    private Scanner scan = Transpay.scan;
     private boolean back = false;
 
     public AccountDetail() {
@@ -68,7 +65,7 @@ public class AccountDetail {
         while (true) {
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                String input = ConsoleLog.getInput(scan);
+                String input = ConsoleLog.getInput();
 
                 if (!input.matches("\\d+")) {
                     throw new NumberFormatException();
@@ -94,7 +91,7 @@ public class AccountDetail {
         while (true) {
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                ConsoleLog.getInput(scan);
+                ConsoleLog.getInput();
                 break;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -165,7 +162,7 @@ public class AccountDetail {
         new TypeWriter(Log.BODY, "Your PIN is: ", false);
         new FlashWriter(Log.HEADING, Transpay.account.getPIN(), true);
 
-        new FlashWriter(Log.BODY, "\n\nPress enter to go back:", true);
+        new FlashWriter(Log.INPUT, "\n\nPress enter to go back:", true);
         goBack();
     }
 }

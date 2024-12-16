@@ -1,6 +1,5 @@
 package transpay.cli.panel;
 
-import java.util.Scanner;
 import java.util.UUID;
 
 import transpay.account.Account;
@@ -16,7 +15,6 @@ public class Register {
     private String PIN;
     private String confirmPIN;
     private double balance;
-    private Scanner scan = Transpay.scan;
     private boolean back = false;
 
     public Register() {
@@ -73,7 +71,7 @@ public class Register {
         while (true) {
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                name = ConsoleLog.getInput(scan);
+                name = ConsoleLog.getInput();
                 
                 if (name.equalsIgnoreCase("exit")) {
                     ConsoleLog.clear(0);
@@ -95,7 +93,7 @@ public class Register {
         while (true) {  
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                PIN = ConsoleLog.getPassword(scan);
+                PIN = ConsoleLog.getPassword();
 
                 if (PIN.equalsIgnoreCase("exit")) {
                     ConsoleLog.clear(0);
@@ -122,7 +120,7 @@ public class Register {
         while (true) {  
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                confirmPIN = ConsoleLog.getPassword(scan);
+                confirmPIN = ConsoleLog.getPassword();
                 
                 if (confirmPIN.equalsIgnoreCase("exit")) {
                     ConsoleLog.clear(0);
@@ -137,8 +135,10 @@ public class Register {
                     continue;
                 }
                 break;
+            } catch (NumberFormatException e) {
+                new FlashWriter(Log.ERROR, "PIN must be numeric and 6 digits long. Please try again.", true);
             } catch (Exception e) {
-                new FlashWriter(Log.ERROR, "PIN contained non-numeric characters. Please try again.", true);
+                new FlashWriter(Log.ERROR, "Invalid input. Please try again.", true);
             }
         }
     }
@@ -147,7 +147,7 @@ public class Register {
         while (true) {
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt + "PHP ", false);
-                String input = ConsoleLog.getInput(scan);
+                String input = ConsoleLog.getInput();
 
                 if (input.equalsIgnoreCase("exit")) {
                     ConsoleLog.clear(0);
@@ -191,7 +191,7 @@ public class Register {
         while (true) {
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                ConsoleLog.getInput(scan);
+                ConsoleLog.getInput();
                 back = true;
                 break;
             } catch (Exception e) {

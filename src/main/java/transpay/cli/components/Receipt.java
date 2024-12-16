@@ -5,7 +5,7 @@ import transpay.cli.Transpay;
 
 public class Receipt {
     public Receipt(double originalBalance, double amount, Transaction transaction) {
-        new FlashWriter(Log.SYSTEM, "\n\t\t\t  Transpay", true);
+        new FlashWriter(Log.SYSTEM, "\n\t\t\t  " + Transpay.brand, true);
         new FlashWriter(Log.SYSTEM, "\t       Your trustworthy banking system\n", true);
 
         new FlashWriter(Log.BODY, "\t  Transaction Type: ", false);
@@ -19,7 +19,7 @@ public class Receipt {
 
         switch (transaction.getType()) {
             case "Deposit":
-                new FlashWriter(Log.BODY, "\t  Original Balance: ", false);
+                new FlashWriter(Log.BODY, "\t  Original Balance: PHP ", false);
                 new FlashWriter(Log.HEADING, String.format("%,.2f", originalBalance), true);
 
                 new FlashWriter(Log.BODY, "\t  Deposit Amount: PHP ", false);
@@ -29,7 +29,7 @@ public class Receipt {
                 new FlashWriter(Log.HEADING, String.format("%,.2f", Transpay.account.getBalance()), true);
                 break;
             case "Withdrawal":
-                new FlashWriter(Log.BODY, "\t  Original Balance: ", false);
+                new FlashWriter(Log.BODY, "\t  Original Balance: PHP ", false);
                 new FlashWriter(Log.HEADING, String.format("%,.2f", originalBalance), true);
 
                 new FlashWriter(Log.BODY, "\t  Withdraw Amount: PHP ", false);
@@ -42,7 +42,7 @@ public class Receipt {
                 new FlashWriter(Log.BODY, "\t  Receiver Account: ", false);
                 new FlashWriter(Log.HEADING, transaction.getTarget(), true);
 
-                new FlashWriter(Log.BODY, "\t  Original Balance: ", false);
+                new FlashWriter(Log.BODY, "\t  Original Balance: PHP ", false);
                 new FlashWriter(Log.HEADING, String.format("%,.2f", originalBalance), true);
 
                 new FlashWriter(Log.BODY, "\t  Transer Amount: PHP ", false);
@@ -57,7 +57,7 @@ public class Receipt {
                 break;
         }
         new FlashWriter(Log.SYSTEM, "\n\t      Thank you for using our service!", true);
-        new FlashWriter(Log.SYSTEM, "\t        Transpay@official.receipt", true);
+        new FlashWriter(Log.SYSTEM, "\t        " + Transpay.brand + "@official.receipt", true);
     }
 
     public static boolean isReceipt() {
@@ -65,7 +65,7 @@ public class Receipt {
         while (true) {
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                String input = ConsoleLog.getInput(Transpay.scan);
+                String input = ConsoleLog.getInput();
 
                 if (!input.equals("y") && !input.equals("n")) {
                     throw new IllegalArgumentException();

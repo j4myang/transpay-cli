@@ -2,7 +2,6 @@ package transpay.cli.panel;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Scanner;
 
 import transpay.bank.Transaction;
 import transpay.cli.Transpay;
@@ -15,7 +14,7 @@ import transpay.cli.components.TypeWriter;
 public class Balance {
     private int choice;
     private String date;
-    private Scanner scan = Transpay.scan;
+    
 
     public Balance() {
         date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
@@ -30,7 +29,7 @@ public class Balance {
 
         ConsoleLog.print("\n");
 
-        if (Transpay.status.equals("Maintenance")) {
+        if (Transpay.status.equals("Under Maintenance")) {
             new FlashWriter(Log.INFO, "The system cannot curently print a receipt", true);
         } 
         else if (Receipt.isReceipt()) {
@@ -58,8 +57,8 @@ public class Balance {
 
             switch (choice) {
                 case 1:
-                    if (Transpay.status.equals("Maintenance")) {
-                        new FlashWriter(Log.ERROR, "The system is currently under maintenance. Please try again later.", true);
+                    if (Transpay.status.equals("Under Maintenance")) {
+                        new FlashWriter(Log.ERROR, "The system is currently Under Maintenance. Please try again later.", true);
                         continue;
                     }
                     else {
@@ -69,8 +68,8 @@ public class Balance {
                         break;
                     }
                 case 2:
-                    if (Transpay.status.equals("Maintenance")) {
-                        new FlashWriter(Log.ERROR, "The system is currently under maintenance. Please try again later.", true);
+                    if (Transpay.status.equals("Under Maintenance")) {
+                        new FlashWriter(Log.ERROR, "The system is currently Under Maintenance. Please try again later.", true);
                         continue;
                     }
                     else {
@@ -80,8 +79,8 @@ public class Balance {
                         break;
                     }
                 case 3:
-                    if (Transpay.status.equals("Maintenance")) {
-                        new FlashWriter(Log.ERROR, "The system is currently under maintenance. Please try again later.", true);
+                    if (Transpay.status.equals("Under Maintenance")) {
+                        new FlashWriter(Log.ERROR, "The system is currently Under Maintenance. Please try again later.", true);
                         continue;
                     }
                     else {
@@ -103,7 +102,7 @@ public class Balance {
         while (true) {
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                String input = ConsoleLog.getInput(scan);
+                String input = ConsoleLog.getInput();
 
                 if (!input.matches("\\d+")) {
                     throw new NumberFormatException();

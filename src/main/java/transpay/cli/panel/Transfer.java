@@ -2,7 +2,6 @@ package transpay.cli.panel;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Scanner;
 
 import transpay.bank.Transaction;
 import transpay.cli.Transpay;
@@ -17,7 +16,6 @@ public class Transfer {
     private double limit = 500000.00;
     private double amount;
     private String targetAccountNumber;
-    private Scanner scan = Transpay.scan;
     private boolean back;
     private String date;
 
@@ -62,7 +60,7 @@ public class Transfer {
         while (true) {  
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                targetAccountNumber = ConsoleLog.getInput(scan);
+                targetAccountNumber = ConsoleLog.getInput();
     
                 if (targetAccountNumber.isBlank()) {
                     new FlashWriter(Log.ERROR, "Account number cannot be empty. Please try again.", true);
@@ -96,7 +94,7 @@ public class Transfer {
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt + "PHP ", false);
 
-                String input = ConsoleLog.getInput(scan);
+                String input = ConsoleLog.getInput();
 
                 if (input.equalsIgnoreCase("exit")) {
                     new FlashWriter(Log.INFO, "\nReturning to Dashboard page...", true);
@@ -132,7 +130,7 @@ public class Transfer {
         while (true) {  
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                PIN = ConsoleLog.getPassword(scan);
+                PIN = ConsoleLog.getPassword();
                 
                 if (PIN.equalsIgnoreCase("exit")) {
                     new FlashWriter(Log.INFO, "\nReturning to Dashboard page...", true);
@@ -181,7 +179,7 @@ public class Transfer {
         while (true) {
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                String input = ConsoleLog.getInput(scan);
+                String input = ConsoleLog.getInput();
                 
                 if (!input.isBlank()) {
                     new FlashWriter(Log.ERROR, "Invalid input. Please try again.", false);
@@ -194,4 +192,3 @@ public class Transfer {
         }
     }
 }
-

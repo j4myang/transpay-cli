@@ -1,7 +1,5 @@
 package transpay.cli.panel;
 
-import java.util.Scanner;
-
 import transpay.cli.Transpay;
 import transpay.cli.components.ConsoleLog;
 import transpay.cli.components.FlashWriter;
@@ -9,7 +7,7 @@ import transpay.cli.components.Log;
 import transpay.cli.components.TypeWriter;
 
 public class Admin {
-    private Scanner scan = Transpay.scan;
+    
     private String idNum;
     private String input;
 
@@ -65,7 +63,7 @@ public class Admin {
         while (true) {
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                idNum = ConsoleLog.getInput(scan);
+                idNum = ConsoleLog.getInput();
 
                 if (idNum.equalsIgnoreCase("exit")) {
                     new Welcome();
@@ -91,7 +89,7 @@ public class Admin {
         while (true) {
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                input = ConsoleLog.getInput(scan);
+                input = ConsoleLog.getInput();
 
                 if (input.equals("1")) {
                     if (Transpay.status.equals("Online")) {

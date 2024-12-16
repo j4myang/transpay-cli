@@ -2,7 +2,6 @@ package transpay.cli.panel;
 
 import java.util.Date;
 import java.text.SimpleDateFormat;
-import java.util.Scanner;
 
 import transpay.bank.Transaction;
 import transpay.cli.Transpay;
@@ -17,7 +16,6 @@ public class Deposit {
     private double limit = 100000.00;
     public double multiple = 100.00;
     private double amount;
-    private Scanner scan = Transpay.scan;
     private boolean back;
     private String date;
 
@@ -58,7 +56,7 @@ public class Deposit {
         while (true) {
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt + "PHP ", false);
-                String input = ConsoleLog.getInput(scan);
+                String input = ConsoleLog.getInput();
                 
                 if (input.equalsIgnoreCase("exit")) {
                     new FlashWriter(Log.INFO, "\nReturning to Dashboard page...", true);
@@ -91,7 +89,7 @@ public class Deposit {
         while (true) {  
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                PIN = ConsoleLog.getPassword(scan);
+                PIN = ConsoleLog.getPassword();
                 
                 if (PIN.equalsIgnoreCase("exit")) {
                     new FlashWriter(Log.INFO, "\nReturning to Dashboard page...", true);
@@ -138,7 +136,7 @@ public class Deposit {
         while (true) {
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                String input = ConsoleLog.getInput(scan);
+                String input = ConsoleLog.getInput();
                 
                 if (!input.isBlank()) {
                     new FlashWriter(Log.ERROR, "Invalid input. Please try again.", false);

@@ -1,6 +1,5 @@
 package transpay.cli.panel;
 
-import java.util.Scanner;
 
 import transpay.account.Account;
 import transpay.cli.Transpay;
@@ -11,7 +10,6 @@ import transpay.cli.components.TypeWriter;
 
 public class Login {
     private String PIN;
-    private Scanner scan = Transpay.scan;
     private Account account;
 
     public Login() {
@@ -44,7 +42,7 @@ public class Login {
         while (true) {
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                String accountNumber = ConsoleLog.getInput(scan);
+                String accountNumber = ConsoleLog.getInput();
                 
                 account = Transpay.accountSystem.getAccount(accountNumber);
                 
@@ -72,7 +70,7 @@ public class Login {
         while (true) {  
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                PIN = ConsoleLog.getPassword(scan);
+                PIN = ConsoleLog.getPassword();
 
                 if (PIN.equalsIgnoreCase("exit")) {
                     ConsoleLog.clear(0);

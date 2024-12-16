@@ -1,7 +1,6 @@
 package transpay.cli.panel;
 
 import java.time.LocalTime;
-import java.util.Scanner;
 
 import transpay.cli.Transpay;
 import transpay.cli.components.ConsoleLog;
@@ -11,7 +10,7 @@ import transpay.cli.components.TypeWriter;
 
 public class Dashboard {
     private int choice;
-    private Scanner scan = Transpay.scan;
+    
 
     public Dashboard() {
         new FlashWriter(Log.HEADING, "\t\t    Good " + computeDayMessage() + ", " + Transpay.account.getName() + "!\n", true);
@@ -59,8 +58,8 @@ public class Dashboard {
 
             switch (choice) {
                 case 1:
-                    if (Transpay.status.equals("Maintenance")) {
-                        new FlashWriter(Log.ERROR, "The system is currently under maintenance. Please try again later.", true);
+                    if (Transpay.status.equals("Under Maintenance")) {
+                        new FlashWriter(Log.ERROR, "The system is currently Under Maintenance. Please try again later.", true);
                         continue;
                     }
     
@@ -68,8 +67,8 @@ public class Dashboard {
                     new Withdraw();
                     break;
                 case 2:
-                    if (Transpay.status.equals("Maintenance")) {
-                        new FlashWriter(Log.ERROR, "The system is currently under maintenance. Please try again later.", true);
+                    if (Transpay.status.equals("Under Maintenance")) {
+                        new FlashWriter(Log.ERROR, "The system is currently Under Maintenance. Please try again later.", true);
                         continue;
                     }
     
@@ -77,8 +76,8 @@ public class Dashboard {
                     new Deposit();
                     break;
                 case 3:
-                    if (Transpay.status.equals("Maintenance")) {
-                        new FlashWriter(Log.ERROR, "The system is currently under maintenance. Please try again later.", true);
+                    if (Transpay.status.equals("Under Maintenance")) {
+                        new FlashWriter(Log.ERROR, "The system is currently Under Maintenance. Please try again later.", true);
                         continue;
                     }
     
@@ -117,7 +116,7 @@ public class Dashboard {
         while (true) {
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                String input = ConsoleLog.getInput(scan);
+                String input = ConsoleLog.getInput();
     
                 if (!input.matches("\\d+")) {
                     throw new NumberFormatException();

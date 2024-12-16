@@ -9,6 +9,7 @@ import transpay.cli.components.ConsoleLog;
 import transpay.cli.panel.Welcome;
 
 public class Transpay {
+    public static String brand = "Transpay";
     public static AccountSystem accountSystem = new AccountSystem();
     public static BankSystem bankSystem = new BankSystem();
     public static final Scanner scan = new Scanner(System.in);
@@ -18,17 +19,16 @@ public class Transpay {
     public static double totalWithdrawals = 0.00;
     public static double totalTransfers = 0.00;
     public static String status = "";
+    public static String[] statuses = {"Online", "Offline", "Under Maintenance"};
 
     public Transpay() {
-        String[] statuses = {"Online", "Offline", "Maintenance"};
-        status = statuses[new Random().nextInt(statuses.length)];
-
         while (!exit) {
+            status = statuses[new Random().nextInt(statuses.length)];
             new Welcome();
         }
         
         scan.close();
-        ConsoleLog.logInfo("\nThanks for using Transpay! Goodbye.");
+        ConsoleLog.logInfo("\nThanks for using " + brand + "! Goodbye.");
         System.exit(0);
     }
 

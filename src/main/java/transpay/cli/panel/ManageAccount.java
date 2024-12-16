@@ -1,7 +1,5 @@
 package transpay.cli.panel;
 
-import java.util.Scanner;
-
 import transpay.cli.Transpay;
 import transpay.cli.components.ConsoleLog;
 import transpay.cli.components.FlashWriter;
@@ -9,7 +7,6 @@ import transpay.cli.components.Log;
 import transpay.cli.components.TypeWriter;
 
 public class ManageAccount {
-    private Scanner scan = Transpay.scan;
     private int choice;
     private String PIN;
 
@@ -43,7 +40,7 @@ public class ManageAccount {
         while (true) {
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                String input = ConsoleLog.getInput(scan);
+                String input = ConsoleLog.getInput();
                 
                 if (!input.matches("\\d+")) {
                     throw new NumberFormatException();
@@ -69,7 +66,7 @@ public class ManageAccount {
         while (true) {
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                name = ConsoleLog.getInput(scan);
+                name = ConsoleLog.getInput();
 
                 if (name.isBlank()) {
                     new FlashWriter(Log.ERROR, "Name cannot be empty. Please try again.", true);
@@ -79,9 +76,14 @@ public class ManageAccount {
                     ConsoleLog.print("\n");
 
                     getUserPIN();
+                    
+                    new TypeWriter(Log.INFO, "Changing name...", true);
+
+                    ConsoleLog.delay(1000);
+
                     String oldName = Transpay.account.getName();
                     Transpay.account.setName(name);
-                    new FlashWriter(Log.INFO, "\nChanged account name from " + oldName + " to " + name, true);
+                    new FlashWriter(Log.SUCCESS, "\nChanged account name from " + oldName + " to " + name, true);
                     break;
                 }
             } catch (Exception e) {
@@ -97,7 +99,7 @@ public class ManageAccount {
         while (true) {
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                newPIN = ConsoleLog.getPassword(scan);
+                newPIN = ConsoleLog.getPassword();
 
                 if (!newPIN.matches("\\d{6}")) {
                     throw new NumberFormatException();
@@ -111,8 +113,12 @@ public class ManageAccount {
 
                     getUserPIN();
 
+                    new TypeWriter(Log.INFO, "Changing PIN...", true);
+
+                    ConsoleLog.delay(1000);
+
                     Transpay.account.setPIN(newPIN);
-                    new FlashWriter(Log.INFO, "\nChanged PIN", true);
+                    new FlashWriter(Log.SUCCESS, "\nChanged PIN", true);
                     break;
                 }
             } catch (NumberFormatException e) {
@@ -128,7 +134,7 @@ public class ManageAccount {
         while (true) {
             try {
                 new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                PIN = ConsoleLog.getPassword(scan);
+                PIN = ConsoleLog.getPassword();
 
                 if (!PIN.matches("\\d{6}")) {
                     throw new NumberFormatException();
