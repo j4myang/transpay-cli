@@ -66,6 +66,8 @@ public class Deposit {
         Transpay.bankSystem.addTransaction(transaction);
         Transpay.totalDeposits += amount;
 
+        transaction.setAccountBalance(originalBalance + amount);
+
         new TypeWriter(Log.SUCCESS, "\nDeposit successful!\n", true);
 
         ConsoleLog.delay(1000);

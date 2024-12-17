@@ -7,71 +7,56 @@ import transpay.cli.components.Log;
 import transpay.cli.components.TypeWriter;
 
 public class Delete {
-    private String choice;
-    private String PIN;
-    
     public Delete() {
-        new FlashWriter(Log.HEADING, "Delete your Account\n", true);
+        new FlashWriter(Log.HEADING, "\t\t    Delete your Account\n", true);
 
-        new TypeWriter(Log.INPUT, "Are you sure you want to delete your account? (y/n)", true);
-        getInput();
-
-        ConsoleLog.print("\n");
-
-        new TypeWriter(Log.INPUT, "Enter your 6-digit PIN (hidden for security):", true);
+        getConfirmation();
         getUserPIN();
-
         deleteAccount();
-
-        new FlashWriter(Log.INFO, "\nReturning to Welcome page...", true);
-
-        ConsoleLog.clear(1000);
-
-        new Welcome();
     }
 
-    private void getInput() {
+    private void getConfirmation() {
+        new TypeWriter(Log.INPUT, "Are you sure you want to delete your account? (y/n)", true);
+
         while (true) {
-            try {
-                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                choice = ConsoleLog.getInput();
-                
-                if (choice.equalsIgnoreCase("y")) {
-                    break;
-                }
-                else if (choice.equalsIgnoreCase("n")) {
-                    new FlashWriter(Log.INFO, "Returning to Dashboard page...", true);
-                    ConsoleLog.clear(1000);
-                    new Dashboard();
-                    break;
-                }
-                else {
-                    new FlashWriter(Log.ERROR, "Invalid choice. Please try again.", true);
-                }
-            } catch (Exception e) {
-                new FlashWriter(Log.ERROR, "Invalid input. Please try again.", true);
+            String input = Dashboard.getValidatedInput(
+                "", 
+                test -> {
+                    return test.equalsIgnoreCase("y") || test.equalsIgnoreCase("n");
+                }, 
+                 "Invalid choice. Please try again.", 
+                 false);
+            
+            if (input.equalsIgnoreCase("y")) {
+                return; 
+            }
+            else {
+                new FlashWriter(Log.OPTION, "Returning to Dashboard...", false);
+                ConsoleLog.clear(1000);
+                new Dashboard();
+                return;
             }
         }
     }
 
     private void getUserPIN() {
+        new TypeWriter(Log.INPUT, "\nEnter your 6-digit PIN (hidden for security):", true);
+
         while (true) {  
-            try {
-                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                PIN = ConsoleLog.getPassword();
-    
-                if (!PIN.matches("\\d{6}")) {
-                    throw new NumberFormatException();
-                }
-                else if (!Transpay.account.getPIN().equals(PIN)) {
-                    new FlashWriter(Log.ERROR, "Incorrect PIN. Please try again.", true);
-                    continue;
-                }
+            String input = Dashboard.getValidatedInput(
+                "", 
+                test1 -> {
+                    return test1.matches("\\d{6}");
+                }, 
+                test2 -> {
+                    return test2.equals(Transpay.account.getPIN());
+                },
+                 "PIN must be numeric and 6 digits long. Please try again.", 
+                 "Incorrect PIN. Please try again.",
+                 false);
+            
+            if (input != null) {
                 break;
-            } catch (NumberFormatException e) {
-                new FlashWriter(Log.ERROR, "PIN must be numeric and 6 digits long. Please try again.", true);
-            } catch (Exception e) {
-                new FlashWriter(Log.ERROR, "Invalid input. Please try again.", true);
             }
         }
     }

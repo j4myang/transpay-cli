@@ -5,6 +5,7 @@ public class Account {
     private String PIN;
     private double balance;
     private String name;
+    private String dateRegistered;
 
     public Account(String accountNumber, String PIN, double balance, String name) {
         this.accountNumber = accountNumber;
@@ -35,6 +36,14 @@ public class Account {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDateRegistered() {
+        return dateRegistered;
+    }
+
+    public void setDateRegistered(String dateRegistered) {
+        this.dateRegistered = dateRegistered;
     }
 
     public void setBalance(double balance) {

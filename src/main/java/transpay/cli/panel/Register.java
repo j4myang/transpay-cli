@@ -1,5 +1,7 @@
 package transpay.cli.panel;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 import transpay.account.Account;
@@ -132,14 +134,16 @@ public class Register {
 
     private String registerAccount(String name, String pin, double balance) {
         String accountNumber = "";
-
+        String currentDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        
         do {
             accountNumber = UUID.randomUUID().toString().split("-")[0];
         }
         while (Transpay.accountSystem.getAccount(accountNumber) != null);
 
        Account regAccount = new Account(accountNumber, pin, balance, name);
-               
+       regAccount.setDateRegistered(currentDate);
+
        Transpay.accountSystem.addAccount(regAccount);
        return accountNumber;
     }

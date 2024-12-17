@@ -1,5 +1,10 @@
 package transpay.cli.panel;
 
+import java.time.Month;
+import java.time.format.TextStyle;
+import java.util.Calendar;
+import java.util.Locale;
+
 import transpay.bank.Transaction;
 import transpay.cli.Transpay;
 import transpay.cli.components.ConsoleLog;
@@ -33,11 +38,14 @@ public class AccountDetail {
 
         new TypeWriter(Log.OPTION, "1. ", false);
         new FlashWriter(Log.BODY, "View transaction history", true);
-
+        
         new TypeWriter(Log.OPTION, "2. ", false);
-        new FlashWriter(Log.BODY, "Show PIN", true);
+        new FlashWriter(Log.BODY, "View Statement of Account", true);
 
         new TypeWriter(Log.OPTION, "3. ", false);
+        new FlashWriter(Log.BODY, "Show PIN", true);
+
+        new TypeWriter(Log.OPTION, "4. ", false);
         new FlashWriter(Log.BODY, "Go Back", true);
 
     }
@@ -54,7 +62,7 @@ public class AccountDetail {
 
                     int temp = Integer.parseInt(test);
                     
-                    return temp >= 1 && temp <= 3;
+                    return temp >= 1 && temp <= 4;
                 } catch (NumberFormatException e) {
                     return false;
             }}, "Invalid choice. Please try again.", false));
@@ -66,9 +74,13 @@ public class AccountDetail {
                     break;
                 case 2:
                     ConsoleLog.clear(0);
-                    showPIN();
+                    viewStatementOfAccount();
                     break;
                 case 3:
+                    ConsoleLog.clear(0);
+                    showPIN();
+                    break;
+                case 4:
                     new FlashWriter(Log.INFO, "Returning to Dashboard...", false);
                     ConsoleLog.clear(1000);
                     new Dashboard();
@@ -95,15 +107,32 @@ public class AccountDetail {
                     new FlashWriter(Log.HEADING, transaction.getType(), true);
     
                     if (transaction.getTarget() != null) {
-                        new TypeWriter(Log.BODY, "Receiver Account: ", false);
-                        new FlashWriter(
-                            Log.HEADING, 
-                            transaction.getTarget().replace(
-                                transaction.getTarget().substring(
-                                    1, 
-                                    transaction.getTarget().length() - 3),
-                                "*".repeat(transaction.getTarget().length() - 3)),
-                     true);
+                        if (transaction.getTransferType().equals("Receiver")) {
+                            new TypeWriter(Log.BODY, "Sender Account: ", false);
+                            new FlashWriter(
+                                Log.HEADING, 
+                                transaction.getTarget().replace(
+                                    transaction.getTarget().substring(
+                                        1, 
+                                        transaction.getTarget().length() - 3),
+                                    "*".repeat(transaction.getTarget().length() - 3)),
+                             true);
+
+                             new TypeWriter(Log.SUCCESS, "\t+", false);
+                        }
+                        else {
+                            new TypeWriter(Log.BODY, "Receiver Account: ", false);
+                            new FlashWriter(
+                                Log.HEADING, 
+                                transaction.getTarget().replace(
+                                    transaction.getTarget().substring(
+                                        1, 
+                                        transaction.getTarget().length() - 3),
+                                    "*".repeat(transaction.getTarget().length() - 3)),
+                         true);
+
+                            new TypeWriter(Log.ERROR, "-", false);
+                        }
                     }
     
                     ConsoleLog.print("\t");
@@ -114,9 +143,7 @@ public class AccountDetail {
                     else if (transaction.getType().equals("Deposit")) {
                         new TypeWriter(Log.SUCCESS, "+", false);
                     }
-                    else if (transaction.getType().equals("Transfer")) {
-                        new TypeWriter(Log.INFO, "~", false);
-                    }
+
                     new TypeWriter(Log.BODY, "  PHP ", false);
                     new FlashWriter(Log.HEADING, String.format("%,.2f", transaction.getAmount()), true);
                 
@@ -137,6 +164,183 @@ public class AccountDetail {
         new FlashWriter(Log.HEADING, Transpay.account.getPIN(), true);
 
         returnToAccountDetail();
+    }
+
+    private void viewStatementOfAccount() {
+        new FlashWriter(Log.INPUT, "Enter the year range (YYYY):", true);
+        String year = getYear();
+
+        new FlashWriter(Log.INPUT, "Enter the start month (MM):", true);
+        String startMonth = getMonth();
+
+        new FlashWriter(Log.INPUT, "Enter the end month (MM):", true);
+        String endMonth = getMonth();
+
+        Transaction[] transactions = Transpay.bankSystem.getAccountTransactionByDateRange(
+            Transpay.account.getAccountNumber(),
+            year,
+            startMonth,
+            endMonth
+        );
+        double startingBalance = transactions[0].getAccountBalance() + transactions[0].getAmount();
+
+        double paidOutBalance = 0;
+        double paidInBalance = 0;
+        
+        for (Transaction transaction : transactions) {
+            if (transaction.getType().equals("Deposit")) {
+                paidInBalance += transaction.getAmount();
+            }
+            else {
+                if (transaction.getType().equals("Transfer") && transaction.getTransferType().equals("Sender")) {
+                    paidOutBalance += transaction.getAmount();
+                    continue;
+                }
+
+                paidInBalance += transaction.getAmount();
+            }
+        }
+
+        String brand = " _______  ______    _______  __    _  _______  _______  _______  __   __ \r\n" +
+        "|       ||    _ |  |   _   ||  |  | ||       ||       ||   _   ||  | |  |  Statement\r\n" +
+        "|_     _||   | ||  |  |_|  ||   |_| ||  _____||    _  ||  |_|  ||  |_|  |    of\r\n" +
+        "  |   |  |   |_||_ |       ||       || |_____ |   |_| ||       ||       |  Account\r\n" +
+        "  |   |  |    __  ||       ||  _    ||_____  ||    ___||       ||_     _|\r\n" +
+        "  |   |  |   |  | ||   _   || | |   | _____| ||   |    |   _   |  |   |  \r\n" +
+        "  |___|  |___|  |_||__| |__||_|  |__||_______||___|    |__| |__|  |___|  ";
+
+        ConsoleLog.clear(0);
+
+        new FlashWriter(Log.HEADING, brand, true);
+
+        new FlashWriter(Log.SYSTEM, "\nAccount Number: ", false);
+        new FlashWriter(Log.HEADING, Transpay.account.getAccountNumber(), true);
+
+        new FlashWriter(Log.SYSTEM, "Account Name: ", false);
+        new FlashWriter(Log.HEADING, Transpay.account.getName(), true);
+
+        new FlashWriter(Log.SYSTEM, "\nPeriod: ", false);
+        new FlashWriter(
+            Log.HEADING, 
+            "01 " +  
+            Month.of(Integer.parseInt(startMonth)).getDisplayName(TextStyle.FULL_STANDALONE, Locale.ENGLISH) + " " +
+            year + 
+            " to 01 " + 
+            Month.of(Integer.parseInt(endMonth)).getDisplayName(TextStyle.FULL_STANDALONE, Locale.ENGLISH) + " " +  
+            (endMonth.equals("January") ? String.valueOf(Integer.parseInt(year) + 1) : year), 
+            true);
+
+        new FlashWriter(Log.SYSTEM, "\n\t\t Starting Balance: PHP ", false);
+        new FlashWriter(Log.HEADING, String.format("%,.2f", startingBalance), true);
+
+        new FlashWriter(Log.SYSTEM, "\t\t Paid In: PHP ", false);
+        new FlashWriter(Log.HEADING, String.format("%,.2f", paidInBalance), true);
+
+        new FlashWriter(Log.SYSTEM, "\t\t Paid Out: PHP ", false);
+        new FlashWriter(Log.HEADING, String.format("%,.2f", paidOutBalance), true);
+
+        new FlashWriter(Log.SYSTEM, "\t\t Ending Balance: PHP ", false);
+        new FlashWriter(Log.HEADING, String.format("%,.2f", startingBalance + paidInBalance - paidOutBalance), true);
+
+        if (transactions.length == 0) {
+            new FlashWriter(Log.INFO, "\nNo transactions found.\n", true);
+        }
+
+        else {
+            new FlashWriter(Log.INFO, String.format(
+        "\n%-15s %-12s %-30s %15s %20s\n", 
+        "Date", "Type", "Description", "Cash Flow", "Real-time Balance"), true);
+
+            new FlashWriter(Log.INFO, String.format(
+        "%-15s %-12s %-30s %15s %20s", 
+                "-".repeat(15), "-".repeat(12), "-".repeat(30), "-".repeat(15), "-".repeat(20)
+            ), true);
+
+            for (Transaction transaction : transactions) {
+                String[] date = transaction.getDate().split("-");
+                String formattedDate = String.format("%s %s %s", date[2].split(" ")[0], 
+                    Month.of(Integer.parseInt(date[1])).getDisplayName(TextStyle.FULL_STANDALONE, Locale.ENGLISH), 
+                    date[0]);
+
+                String description;
+                if (transaction.getTarget() != null) {
+                    String maskedTarget = transaction.getTarget().replace(
+                        transaction.getTarget().substring(1, transaction.getTarget().length() - 3),
+                        "*".repeat(transaction.getTarget().length() - 3));
+
+                    if (transaction.getTransferType().equals("Receiver")) {
+                        description = "Received from " + maskedTarget;
+                    } else {
+                        description = "Sent to " + maskedTarget;
+                    }
+                } else {
+                    description = "-";
+                }
+
+                if (description.length() > 30) {
+                    description = description.substring(0, 27) + "...";
+                }
+
+                String cashFlow = transaction.getType().equals("Deposit") || transaction.getType().equals("Transfer") && transaction.getTransferType().equals("Receiver") ? 
+                    String.format(ConsoleLog.colorSuccess + "+ " + ConsoleLog.RESET_CODE + "PHP %,.2f", transaction.getAmount()) : 
+                    String.format(ConsoleLog.colorError + "- " + ConsoleLog.RESET_CODE +"PHP %,.2f", transaction.getAmount());
+
+                String balance = String.format("PHP %,.2f", transaction.getAccountBalance());
+
+                new FlashWriter(Log.BODY, String.format(
+                    "%-15s %-12s %-30s %15s %20s", 
+                    formattedDate, 
+                    transaction.getType(), 
+                    description, 
+                    cashFlow, 
+                    balance
+                ), true);
+            }
+        
+            returnToAccountDetail();
+        }
+    }
+    
+    private String getYear() {
+        while (true) {
+            String year = Dashboard.getValidatedInput("", test1 -> {
+                try {
+                    int temp = Integer.parseInt(test1);
+                    return temp >= Integer.parseInt(Transpay.account.getDateRegistered().split("-")[0]) && temp <= Calendar.getInstance().get(Calendar.YEAR);
+                } catch (NumberFormatException e) {
+                    return false;
+                }
+            }, test2 -> {
+                return test2.matches("\\d{4}");
+            },
+             "Invalid year range. Please try again.",
+             "Follow the year format (YYYY). Please try again.", false);
+    
+            if (year != null) {
+                return year;
+            }
+        }
+    }
+
+    private String getMonth() {
+        while (true) {
+            String month = Dashboard.getValidatedInput("", test1 -> {
+                try {
+                    int temp = Integer.parseInt(test1);
+                    return temp >= 1 && temp <= 12;
+                } catch (NumberFormatException e) {
+                    return false;
+                }
+            },
+            test2 -> {
+                return test2.matches("\\d{2}");
+            }, "Invalid month range. Please try again.", 
+            "Follow the month format (MM). Please try again.", false);
+    
+            if (month != null) {
+                return month;
+            }
+        }
     }
 
     private void returnToAccountDetail() {

@@ -40,6 +40,46 @@ public class BankSystem {
         return transactions;
     }
 
+    public Transaction[] getAccountTransactionByDateRange(String accountNumber, String year, String startMonth, String endMonth) {
+        BankTransaction current = head;
+        Transaction[] transactions = new Transaction[0];
+
+        while (current != null) {
+            if (current.getTransaction().getAccount().getAccountNumber().equals(accountNumber)) {
+                String[] transactionDate = current.getTransaction().getDate().split("-");
+                String transactionYear = transactionDate[0];
+                String transactionMonth = transactionDate[1];
+
+                if (transactionYear.equals(year) || transactionYear.equals(String.valueOf(Integer.parseInt(year) + 1))) {
+                    if (isWithinDateRange(startMonth, endMonth, transactionYear, transactionMonth, year)) {
+                        Transaction[] newTransactions = new Transaction[transactions.length + 1];
+                        for (int i = 0; i < transactions.length; i++) {
+                            newTransactions[i] = transactions[i];
+                        }
+                        newTransactions[newTransactions.length - 1] = current.getTransaction();
+                        transactions = newTransactions;
+                    }
+                }
+            }
+            current = current.getPointer();
+        }
+
+        return transactions;
+    }
+
+    private boolean isWithinDateRange(String startMonth, String endMonth, String transactionYear, String transactionMonth, String startYear) {
+        int start = Integer.parseInt(startMonth);
+        int end = Integer.parseInt(endMonth);
+        int transaction = Integer.parseInt(transactionMonth);
+    
+        if (start <= end) {
+            return transaction >= start && transaction <= end && transactionYear.equals(startYear);
+        } else {
+            return (transaction >= start && transaction <= 12 && transactionYear.equals(startYear)) || 
+                   (transaction >= 1 && transaction <= end && transactionYear.equals(String.valueOf(Integer.parseInt(startYear) + 1)));
+        }
+    }
+
     public void deleteTransactionByAccount(String accountNumber) {
         BankTransaction current = head;
         BankTransaction previous = null;

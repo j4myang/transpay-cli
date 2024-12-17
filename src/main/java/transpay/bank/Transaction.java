@@ -5,7 +5,9 @@ import transpay.account.Account;
 public class Transaction {
     private Account account;
     private String target;
+    private String transferType;
     private double amount;
+    private double accountBalance;
     private String type;
     private String date;
     
@@ -40,6 +42,14 @@ public class Transaction {
         this.target = target;
     }
 
+    public String getTransferType() {
+        return transferType;
+    }
+
+    public void setTransferType(String transferType) {
+        this.transferType = transferType;
+    }
+
     public void setDate(String date) {
         this.date = date;
     }
@@ -50,5 +60,13 @@ public class Transaction {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public void setAccountBalance(double balance) {
+        this.accountBalance = balance;
+    }
+
+    public double getAccountBalance() {
+        return accountBalance;
     }
 }

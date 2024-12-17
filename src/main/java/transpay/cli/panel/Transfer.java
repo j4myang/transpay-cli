@@ -59,7 +59,7 @@ public class Transfer {
     }
 
     private double getAmount() {
-        new TypeWriter(Log.INPUT, "Enter the amount you want to transfer:", true);
+        new TypeWriter(Log.INPUT, "\nEnter the amount you want to transfer:", true);
 
         while (true) {
             String input = Dashboard.getValidatedInput(
@@ -89,12 +89,21 @@ public class Transfer {
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         Transaction transaction = new Transaction(Transpay.account, amount, "Transfer", date);
         transaction.setTarget(targetAccount);
+        transaction.setTransferType("Sender");
+
+        Transaction receiverTransaction = new Transaction(Transpay.accountSystem.getAccount(targetAccount), amount, "Transfer", date);
+        receiverTransaction.setTarget(Transpay.account.getAccountNumber());
+        receiverTransaction.setTransferType("Receiver");
+
         double originalBalance = Transpay.account.getBalance();
 
         Transpay.account.transfer(Transpay.accountSystem.getAccount(targetAccount), amount);
         Transpay.bankSystem.addTransaction(transaction);
+        Transpay.bankSystem.addTransaction(receiverTransaction);
         Transpay.totalTransfers += amount;
 
+        transaction.setAccountBalance(originalBalance - amount);
+        
         new TypeWriter(Log.SUCCESS, "\nTransfer successful!\n", true);
 
         ConsoleLog.delay(1000);

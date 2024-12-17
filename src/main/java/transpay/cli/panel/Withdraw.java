@@ -65,6 +65,8 @@ public class Withdraw {
         Transpay.account.withdraw(amount);
         Transpay.bankSystem.addTransaction(transaction);
         Transpay.totalWithdrawals += amount;
+
+        transaction.setAccountBalance(originalBalance - amount);
         
         new TypeWriter(Log.SUCCESS, "\nWithdrawal successful!\n", true);
         

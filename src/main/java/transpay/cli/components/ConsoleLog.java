@@ -7,7 +7,7 @@ import java.util.NoSuchElementException;
 import transpay.cli.Transpay;
 
 public class ConsoleLog {
-    private static final String RESET_CODE = "\033[0m";
+    public static final String RESET_CODE = "\033[0m";
     private static final String CUSTOM_COLOR_CODE = "\033[38;2;%d;%d;%dm";
     private static PrintStream out = System.out;
     private static PrintStream err = System.err;

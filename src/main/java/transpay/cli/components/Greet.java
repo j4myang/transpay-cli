@@ -1,42 +1,23 @@
 package transpay.cli.components;
 
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-
 public class Greet {
-    private Font font = new Font("Monospace", Font.BOLD, 12);
-
-
     public Greet(String input) {
-        BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
-        Graphics g = img.getGraphics();
-        g.setFont(font);
-        int width = g.getFontMetrics().stringWidth(input);
-
-        BufferedImage img1 = new BufferedImage(width, 12, BufferedImage.TYPE_INT_RGB);
-        Graphics g1 = img1.getGraphics();
-        g1.setFont(font);
-
-        ((Graphics2D) g1).drawString(input, 0, g1.getFontMetrics(g1.getFont()).getAscent() - g1.getFontMetrics(g1.getFont()).getDescent());
+        String brand = " _______  ______    _______  __    _  _______  _______  _______  __   __ \r\n" +
+                        "|       ||    _ |  |   _   ||  |  | ||       ||       ||   _   ||  | |  |\r\n" +
+                        "|_     _||   | ||  |  |_|  ||   |_| ||  _____||    _  ||  |_|  ||  |_|  |\r\n" +
+                        "  |   |  |   |_||_ |       ||       || |_____ |   |_| ||       ||       |\r\n" +
+                        "  |   |  |    __  ||       ||  _    ||_____  ||    ___||       ||_     _|\r\n" +
+                        "  |   |  |   |  | ||   _   || | |   | _____| ||   |    |   _   |  |   |  \r\n" +
+                        "  |___|  |___|  |_||__| |__||_|  |__||_______||___|    |__| |__|  |___|  ";
 
         ConsoleLog.clear(0);
 
-        for (int i = 0; i < 12; i++) {
-            StringBuilder stringBuilder = new StringBuilder();
-
-            for (int j = 0; j < width; j++) {
-                stringBuilder.append(img1.getRGB(j, i) == java.awt.Color.WHITE.getRGB() ? "]" : " ");
-            }
-
-            if (stringBuilder.toString().trim().isBlank()) {
-                continue;
-            }
-            
-            new TypeWriter(Log.HEADING, stringBuilder.toString(), 1, true);
-	    }
+        for (char c: brand.toCharArray()) {
+            new TypeWriter(Log.HEADING, String.valueOf(c), false);
+        }
 
         ConsoleLog.clear(1000);
+        
+        ConsoleLog.print("\n");
     }
 }

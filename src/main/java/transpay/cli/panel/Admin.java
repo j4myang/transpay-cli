@@ -7,28 +7,103 @@ import transpay.cli.components.Log;
 import transpay.cli.components.TypeWriter;
 
 public class Admin {
-    
-    private String idNum;
-    private String input;
+    String id = "";
 
     public Admin() {
         new FlashWriter(Log.HEADING, "\t\t  Log in as Administrator\n", true);
         new TypeWriter(Log.BODY, "    If going here was a mistake, use 'exit' command\n", true);
 
         new TypeWriter(Log.INPUT, "Enter your ID Number: ", true);
-        getID();
+        id = getID();
         
         new TypeWriter(Log.SUCCESS, "\nLogin successful! Please wait a moment...", true);
 
         ConsoleLog.clear(1000);
 
-        new FlashWriter(Log.HEADING, "\t\t    Good " + Dashboard.computeDayMessage() + ", " + idNum + "!\n", true);
+        displayAdminPage();
+    }
 
-        new TypeWriter(Log.SYSTEM, "ATM Stats\n", true);
+    private String getID() {
+        while (true) {
+            String input = Welcome.getValidatedInput(
+                "", 
+                test -> {
+                    return test.matches("\\d{10}");
+                },
+                 "Invalid ID. Please try again.",
+                  false);
+
+            if (input != null) {
+                return input;
+            }
+        }
+    }
+
+    private void displayAdminPage() {
+        new FlashWriter(Log.HEADING, "\t\t    Good " + Dashboard.computeDayMessage() + ", " + id + "!\n", true);
+
+        new TypeWriter(Log.SYSTEM, "\t\t    ATM Stats\n", true);
 
         new TypeWriter(Log.SYSTEM, "Current Status: ", false);
         new FlashWriter(Log.HEADING, Transpay.status + "\n", true);
 
+        new TypeWriter(Log.SYSTEM, "\nActions\n", true);
+
+        new TypeWriter(Log.OPTION, "1. ", false);
+        new FlashWriter(Log.BODY, "Fix", true);
+
+        new TypeWriter(Log.OPTION, "2. ", false);
+        new FlashWriter(Log.BODY, "Show ATM Report", true);
+
+        new TypeWriter(Log.OPTION, "3. ", false);
+        new FlashWriter(Log.BODY, "Go Back", true);
+
+        handleAction();
+    }
+
+    private void handleAction() {
+        new TypeWriter(Log.INPUT, "\nWhat would you like to do?", true);
+
+        while (true) {
+            String action = Welcome.getValidatedInput(
+                "", 
+                test -> {
+                    return Double.parseDouble(test) >= 1 && Double.parseDouble(test) <= 3;
+                },
+                 "Invalid input. Please try again.",
+                  false
+            );
+
+            switch (action) {
+                case "1":
+                    if (Transpay.status.equals("Online")) {
+                        new FlashWriter(Log.ERROR, "The system is already online.", true);
+                        break;
+                    }
+                    
+                    new FlashWriter(Log.INFO, "\nFixing the system...", true);
+
+                    ConsoleLog.delay(1000);
+
+                    Transpay.status = "Online";
+                    
+                    new TypeWriter(Log.SUCCESS, "\nThe system is now online.", true);
+                    break;
+
+                case "2":
+                    ConsoleLog.clear(0);
+                    displayAtmReport();
+                    break;
+                
+                case "3":
+                    ConsoleLog.clear(0);
+                    new Welcome();
+                    break;
+            }
+        }
+    }
+
+    private void displayAtmReport() {
         new TypeWriter(Log.SYSTEM, "Total Accounts: ", false);
         new FlashWriter(Log.HEADING, String.format("%,d\n", Transpay.accountSystem.length()), true);
 
@@ -47,77 +122,16 @@ public class Admin {
         new TypeWriter(Log.SYSTEM, "\tTotal Transfers: PHP ", false);
         new FlashWriter(Log.HEADING, String.format("%,.2f", Transpay.totalTransfers), true);
 
-        new TypeWriter(Log.SYSTEM, "\nActions\n", true);
-
-        new TypeWriter(Log.OPTION, "1. ", false);
-        new FlashWriter(Log.BODY, "Fix", true);
-
-        new TypeWriter(Log.OPTION, "2. ", false);
-        new FlashWriter(Log.BODY, "Go Back", true);
-
-        new TypeWriter(Log.INPUT, "\nWhat would you like to do?", true);
-        getInput();
+        returnToAdmin();
     }
 
-    private void getID() {
-        while (true) {
-            try {
-                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                idNum = ConsoleLog.getInput();
+    private void returnToAdmin() {
+        new TypeWriter(Log.INPUT, "\nPress enter to go back:", true);
+        new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
+        ConsoleLog.getInput();
 
-                if (idNum.equalsIgnoreCase("exit")) {
-                    new Welcome();
-                    return;
-                }
-                else if (idNum.isBlank()) {
-                    new FlashWriter(Log.ERROR, "Invalid input. Please try again.", true);
-                    continue;
-                }
-                else if (!idNum.matches("\\d{10}")) {
-                    throw new NumberFormatException();
-                }
-                break;
-            } catch (NumberFormatException e) {
-                new FlashWriter(Log.ERROR, "PIN must be numeric and 6 digits long. Please try again.", true);
-            } catch (Exception e) {
-                new FlashWriter(Log.ERROR, "Invalid input. Please try again.", true);
-            }
-        }
+        new FlashWriter(Log.INFO, "Returning to Admin...", false);
+        ConsoleLog.clear(1000);
+        displayAdminPage();
     }
-
-    private void getInput() {
-        while (true) {
-            try {
-                new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
-                input = ConsoleLog.getInput();
-
-                if (input.equals("1")) {
-                    if (Transpay.status.equals("Online")) {
-                        new FlashWriter(Log.INFO, "The system is already online.", true);
-                    }
-                    else {
-                        new FlashWriter(Log.INFO, "\nFixing the system...", true);
-                        ConsoleLog.delay(1500);
-                        Transpay.status = "Online";
-                        new TypeWriter(Log.SUCCESS, "\nThe system is now online!", true);
-                        ConsoleLog.delay(1000);
-                    }
-                }
-
-                else if (input.equals("2")) {
-                    new Welcome();
-                    break;
-                }
-                else {
-                    new FlashWriter(Log.ERROR, "Invalid input. Please try again.", true);
-                }
-            } catch (NumberFormatException e) {
-                new FlashWriter(Log.ERROR, "PIN must be numeric and 6 digits long. Please try again.", true);
-            } catch (Exception e) {
-                new FlashWriter(Log.ERROR, "Invalid input. Please try again.", true);
-            }
-        }
-    }
-
-    
 }
