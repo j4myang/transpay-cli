@@ -31,7 +31,7 @@ public class Delete {
                 return; 
             }
             else {
-                new FlashWriter(Log.OPTION, "Returning to Dashboard...", false);
+                new FlashWriter(Log.INFO, "Returning to Dashboard...", false);
                 ConsoleLog.clear(1000);
                 new Dashboard();
                 return;
@@ -63,7 +63,7 @@ public class Delete {
 
     private void deleteAccount() {
         Transpay.accountSystem.deleteAccount(Transpay.account.getAccountNumber());
-        new FlashWriter(Log.INFO, "\nAccount deleted successfully.", true);
+        new TypeWriter(Log.SUCCESS, "\nAccount deleted successfully.", true);
 
         ConsoleLog.clear(1000);
         new Start();

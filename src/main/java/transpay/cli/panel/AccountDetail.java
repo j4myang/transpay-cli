@@ -103,55 +103,46 @@ public class AccountDetail {
             }
             else {
                 for (Transaction transaction : transactions) {
-                    new TypeWriter(Log.BODY, "Transaction Date: ", false);
+                    new FlashWriter(Log.SYSTEM, "Date: ", false);
                     new FlashWriter(Log.HEADING, transaction.getDate(), true);
-    
-                    new TypeWriter(Log.BODY, "Transaction Type: ", false);
-                    new FlashWriter(Log.HEADING, transaction.getType(), true);
-    
+
+                    new FlashWriter(Log.SYSTEM, "Type: ", false);
+                    new FlashWriter(Log.HEADING, transaction.getType(), true); 
+
                     if (transaction.getType().equals("Transfer")) {
                         if (transaction.getTransferType().equals("Receiver")) {
-                            new TypeWriter(Log.BODY, "Sender Account: ", false);
-                            new FlashWriter(
-                                Log.HEADING, 
-                                transaction.getTarget().replace(
-                                    transaction.getTarget().substring(
-                                        1, 
-                                        transaction.getTarget().length() - 3),
-                                    "*".repeat(transaction.getTarget().length() - 3)),
-                             true);
-
-                             new TypeWriter(Log.SUCCESS, "\t+", false);
+                            new FlashWriter(Log.SYSTEM, "Sender Account: ", false);
                         }
                         else {
-                            new TypeWriter(Log.BODY, "Receiver Account: ", false);
-                            new FlashWriter(
-                                Log.HEADING, 
-                                transaction.getTarget().replace(
-                                    transaction.getTarget().substring(
-                                        1, 
-                                        transaction.getTarget().length() - 3),
-                                    "*".repeat(transaction.getTarget().length() - 3)),
-                         true);
-
-                            new TypeWriter(Log.ERROR, "\t-", false);
+                            new FlashWriter(Log.SYSTEM, "Receiver Account: ", false);
                         }
+
+                        String maskedAccount = transaction.getTarget().replace(
+                            transaction.getTarget().substring(
+                            1, 
+                            transaction.getTarget().length() - 3),
+                            "*".repeat(transaction.getTarget().length() - 3));
+
+                            new FlashWriter(Log.HEADING, maskedAccount, true);
                     }
 
-                    if (transaction.getType().equals("Withdrawal")) {
-                        new TypeWriter(Log.ERROR, "\t-", false);
+                    new FlashWriter(Log.SYSTEM, "Amount: ", false);
+                    
+                    if (transaction.getType().equals("Deposit") || transaction.getType().equals("Transfer") && transaction.getTransferType().equals("Receiver")) {
+                        new FlashWriter(Log.SUCCESS, String.format("+ ", transaction.getAmount()), false);
                     }
-                    else if (transaction.getType().equals("Deposit")) {
-                        new TypeWriter(Log.SUCCESS, "\t+", false);
+                    else {
+                        new FlashWriter(Log.ERROR, String.format("- ", transaction.getAmount()), false);
                     }
+                    
+                    new FlashWriter(Log.SYSTEM, "PHP ", false);
 
-                    new TypeWriter(Log.BODY, "  PHP ", false);
                     new FlashWriter(Log.HEADING, String.format("%,.2f", transaction.getAmount()), true);
-                
-                    ConsoleLog.print("\n\n");
+
+                    ConsoleLog.print("\n");
                 }
             }
-            
+
             returnToAccountDetail();
         }
     }
@@ -208,12 +199,12 @@ public class AccountDetail {
                 paidInBalance += transaction.getAmount();
             }
             else {
-                if (transaction.getType().equals("Transfer") && transaction.getTransferType().equals("Sender")) {
-                    paidOutBalance += transaction.getAmount();
+                if (transaction.getType().equals("Transfer") && transaction.getTransferType().equals("Receiver")) {
+                    paidInBalance += transaction.getAmount();
                     continue;
                 }
 
-                paidInBalance += transaction.getAmount();
+                paidOutBalance += transaction.getAmount();
             }
         }
 

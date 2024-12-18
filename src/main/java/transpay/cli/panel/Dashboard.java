@@ -24,7 +24,7 @@ public class Dashboard {
 
                     int temp = Integer.parseInt(test);
                     
-                    return temp >= 1 && temp <= 9;
+                    return temp >= 1 && temp <= 8;
                 } catch (NumberFormatException e) {
                     return false;
             }}, "Invalid choice. Please try again.", false));
@@ -64,12 +64,9 @@ public class Dashboard {
         new TypeWriter(Log.OPTION, "7. ", false);
         new FlashWriter(Log.BODY, "Logout", true);
 
-        new TypeWriter(Log.OPTION, "8. ", false);
-        new FlashWriter(Log.BODY, "Exit", true);
-
         new TypeWriter(Log.BODY, "\nAdvanced\n", true);
 
-        new TypeWriter(Log.OPTION, "9. ", false);
+        new TypeWriter(Log.OPTION, "8. ", false);
         new FlashWriter(Log.BODY, "Delete account", true);
     }
 
@@ -109,10 +106,6 @@ public class Dashboard {
                 new Start();
                 break;
             case 8:
-                ConsoleLog.clear(0);
-                Transpay.exit = true;
-                break;
-            case 9:
                 ConsoleLog.clear(0);
                 new Delete();
                 break;

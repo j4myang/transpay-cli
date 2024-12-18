@@ -34,7 +34,7 @@ public class Transpay {
     public static String[] ragdolls;
     
     public Transpay() {
-        while (!exit) {
+         while (!exit) {
             status = statuses[new Random().nextInt(statuses.length)];
             new Start();
         }

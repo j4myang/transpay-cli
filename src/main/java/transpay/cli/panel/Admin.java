@@ -152,7 +152,7 @@ public class Admin {
         new FlashWriter(Log.INFO, "\nGenerating Ragdoll Account...", true);
 
         String accountPIN = String.valueOf((int) (Math.random() * 900000) + 100000);
-        double accountBalance = (double) (Math.random() * 10000) + 10000;
+        double accountBalance = new Random().nextDouble(150.00, 99999.99);
         String accountName = "Ragdoll No. " + ++Transpay.ragdollCount;
         String accountNumber = "";
         
@@ -179,7 +179,7 @@ public class Admin {
 
         Transpay.accountSystem.addAccount(regAccount);
        
-        for (int i = 0; i < new Random().nextInt(10, 51); i++) {
+        for (int i = 0; i < new Random().nextInt(25, 101); i++) {
             generateRagdollRandomTransactions(regAccount);
         }
 
@@ -212,13 +212,26 @@ public class Admin {
     }
 
     private void generateRagdollRandomTransactions(Account ragdollAccount) {
-        String randomTransactionType = Math.random() < 0.5 ? "Deposit" : "Withdrawal";
-        
-        int minimum = (100 + 99) / 100 * 100;
-        int maximum = (int) ragdollAccount.getBalance() / 100 * 100;
+        String[] transactionTypes = {"Deposit", "Withdrawal", "Transfer"};
 
-        double randomAmount = new Random().nextInt((maximum - minimum) / 100 + 1) * 100;
+        String randomTransactionType = Transpay.ragdolls.length > 1 ? 
+        transactionTypes[new Random().nextInt(transactionTypes.length)] : 
+        transactionTypes[new Random().nextInt(transactionTypes.length - 1)];
+
+        int minimum = 100;
+        int maximum = (int) ragdollAccount.getBalance() / 100 * 100;
+        
+        if (maximum < minimum) {
+            maximum = 1000;
+        }
+
+        double randomAmount = new Random().nextInt((maximum - minimum) / 100 + 1 + 1) * 100;
+
         String randomDate = generateRandomDate(Integer.parseInt(ragdollAccount.getDateRegistered().split("-")[0]), Year.now().getValue());
+
+        if (ragdollAccount.getBalance() - randomAmount <= 100) {
+            randomTransactionType = "Deposit";
+        }
 
         if (randomTransactionType.equals("Deposit")) {
             double originalBalance = ragdollAccount.getBalance();
@@ -227,15 +240,40 @@ public class Admin {
 
             ragdollAccount.deposit(randomAmount);
             transaction.setAccountBalance(originalBalance + randomAmount);
-        }
-        else {
+
+            Transpay.totalDeposits += randomAmount;
+        } else if (randomTransactionType.equals("Withdrawal")) {
             double originalBalance = ragdollAccount.getBalance();
             Transaction transaction = new Transaction(ragdollAccount, randomAmount, "Withdrawal", randomDate);
-
-            ragdollAccount.withdraw(randomAmount);
             Transpay.bankSystem.addTransaction(transaction);
-
+    
+            ragdollAccount.withdraw(randomAmount);
             transaction.setAccountBalance(originalBalance - randomAmount);
+    
+            Transpay.totalWithdrawals += randomAmount;
+        } else if (randomTransactionType.equals("Transfer")) {
+            String randomTargetAccount = "";
+
+            do {
+                randomTargetAccount = Transpay.ragdolls[new Random().nextInt(Transpay.ragdolls.length)];
+            } while (randomTargetAccount.equals(ragdollAccount.getAccountNumber()));
+
+            double originalBalance = ragdollAccount.getBalance();
+            Transaction transaction = new Transaction(ragdollAccount, randomAmount, "Transfer", randomDate);
+            transaction.setTarget(randomTargetAccount);
+            transaction.setTransferType("Sender");
+            transaction.setAccountBalance(originalBalance - randomAmount);
+    
+            Transaction receiverTransaction = new Transaction(Transpay.accountSystem.getAccount(randomTargetAccount), randomAmount, "Transfer", randomDate);
+            receiverTransaction.setTarget(ragdollAccount.getAccountNumber());
+            receiverTransaction.setTransferType("Receiver");
+            receiverTransaction.setAccountBalance(receiverTransaction.getAccount().getBalance() + randomAmount);
+    
+            Transpay.totalTransfers += randomAmount;
+    
+            ragdollAccount.transfer(Transpay.accountSystem.getAccount(randomTargetAccount), randomAmount);
+            Transpay.bankSystem.addTransaction(transaction);
+            Transpay.bankSystem.addTransaction(receiverTransaction);
         }
     }
 
