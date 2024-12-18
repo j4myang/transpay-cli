@@ -68,18 +68,18 @@ public class Start {
                 case 1:
                     ConsoleLog.clear(0);
                     new Register();
-                    break;
+                    return;
                 case 2:
                     ConsoleLog.clear(0);
                     new Login();
-                    break;
+                    return;
                 case 3:
                     Transpay.exit = true;
                     return;
                 case 4:
                     ConsoleLog.clear(0);
                     new Admin();
-                    break;
+                    return;
             }
         }
     }
@@ -160,7 +160,7 @@ public class Start {
         }
     }
     
-    public static void returnToWelcome() {
+    public static void returnToStart() {
         new TypeWriter(Log.INPUT, "\nPress enter to go back:", true);
         new FlashWriter(Log.INPUT, ConsoleLog.inputPrompt, false);
         ConsoleLog.getInput();
@@ -168,5 +168,6 @@ public class Start {
         new FlashWriter(Log.INFO, "Returning to Start page...", false);
         ConsoleLog.clear(1000);
         new Start();
+        return;
     }
 }

@@ -74,20 +74,20 @@ public class AccountDetail {
                 case 1:
                     ConsoleLog.clear(0);
                     viewTransactionHistory();
-                    break;
+                    return;
                 case 2:
                     ConsoleLog.clear(0);
                     viewStatementOfAccount();
-                    break;
+                    return;
                 case 3:
                     ConsoleLog.clear(0);
                     showPIN();
-                    break;
+                    return;
                 case 4:
                     new FlashWriter(Log.INFO, "Returning to Dashboard...", false);
                     ConsoleLog.clear(1000);
                     new Dashboard();
-                    break;
+                    return;
             }
         }
     }

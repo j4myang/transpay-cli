@@ -35,7 +35,7 @@ public class Register {
 
         displaySummary(accountNumber, username, pin, balance);
 
-        Start.returnToWelcome();
+        Start.returnToStart();
     }
 
 

@@ -105,11 +105,11 @@ public class Admin {
                 case "2":
                     ConsoleLog.clear(0);
                     displayAtmReport();
-                    break;
+                    return;
 
                 case "3":
                     createRagdollAccount();
-                    break;
+                    return;
                 
                 case "4":
                     purgeRagdollAccounts();
@@ -119,7 +119,7 @@ public class Admin {
                     new FlashWriter(Log.INFO, "Returning to Start page...", false);
                     ConsoleLog.clear(1000);
                     new Start();
-                    break;
+                    return;
             }
         }
     }
@@ -321,5 +321,6 @@ public class Admin {
         new FlashWriter(Log.INFO, "Returning to Admin...", false);
         ConsoleLog.clear(1000);
         displayAdminPage();
+        return;
     }
 }

@@ -80,35 +80,35 @@ public class Dashboard {
             case 1:
                 ConsoleLog.clear(0); 
                 new Withdraw();
-                break;
+                return;
             case 2:
                 ConsoleLog.clear(0); 
                 new Deposit();
-                break;
+                return;
             case 3:
                 ConsoleLog.clear(0); 
                 new Transfer();
-                break;
+                return;
             case 4:
                 ConsoleLog.clear(0);
                 new Balance();
-                break;
+                return;
             case 5:
                 ConsoleLog.clear(0);
                 new AccountDetail();
-                break;
+                return;
             case 6:
                 ConsoleLog.clear(0);
                 new ManageAccount();
-                break;
+                return;
             case 7:
                 ConsoleLog.clear(0);
                 new Start();
-                break;
+                return;
             case 8:
                 ConsoleLog.clear(0);
                 new Delete();
-                break;
+                return;
         }
     }
 
@@ -216,6 +216,7 @@ public class Dashboard {
         ConsoleLog.clear(1000);
 
         new Dashboard();
+        return;
     }
 
     public static String computeDayMessage() {
