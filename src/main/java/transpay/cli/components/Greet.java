@@ -12,9 +12,7 @@ public class Greet {
 
         ConsoleLog.clear(0);
 
-        for (char c: brand.toCharArray()) {
-            new TypeWriter(Log.HEADING, String.valueOf(c), false);
-        }
+        new FlashWriter(Log.HEADING, brand, false);
 
         ConsoleLog.clear(1000);
         

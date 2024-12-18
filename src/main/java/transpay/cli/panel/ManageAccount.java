@@ -49,7 +49,8 @@ public class ManageAccount {
                     changePIN();
                     break;
                 case 3:
-                    ConsoleLog.clear(0);
+                    new FlashWriter(Log.INFO, "Returning to Dashboard...", false);
+                    ConsoleLog.clear(1000);
                     new Dashboard();
                     break;
             }

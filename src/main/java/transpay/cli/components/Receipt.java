@@ -40,7 +40,9 @@ public class Receipt {
                 break;
             case "Transfer":
                 new FlashWriter(Log.BODY, "\t  Receiver Account: ", false);
-                new FlashWriter(Log.HEADING, transaction.getTarget(), true);
+                new FlashWriter(Log.HEADING, transaction.getTarget().replace(
+                    transaction.getTarget().substring(1, transaction.getTarget().length() - 3),
+                    "*".repeat(transaction.getTarget().length() - 3)), true);
 
                 new FlashWriter(Log.BODY, "\t  Original Balance: PHP ", false);
                 new FlashWriter(Log.HEADING, String.format("%,.2f", originalBalance), true);

@@ -94,6 +94,7 @@ public class Transfer {
         Transaction receiverTransaction = new Transaction(Transpay.accountSystem.getAccount(targetAccount), amount, "Transfer", date);
         receiverTransaction.setTarget(Transpay.account.getAccountNumber());
         receiverTransaction.setTransferType("Receiver");
+        receiverTransaction.setAccountBalance(receiverTransaction.getAccount().getBalance() + amount);
 
         double originalBalance = Transpay.account.getBalance();
 

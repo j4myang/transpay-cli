@@ -26,9 +26,12 @@ public class Transpay {
     public static double totalDeposits = 0.00;
     public static double totalWithdrawals = 0.00;
     public static double totalTransfers = 0.00;
+    public static int ragdollCount = 0;
 
     public static String status = "";   
     public static String[] statuses = {"Online", "Offline", "Under Maintenance"};
+    
+    public static String[] ragdolls;
     
     public Transpay() {
         while (!exit) {

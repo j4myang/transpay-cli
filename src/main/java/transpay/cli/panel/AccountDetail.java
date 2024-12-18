@@ -34,6 +34,9 @@ public class AccountDetail {
         new TypeWriter(Log.BODY, "PIN: ", false);
         new FlashWriter(Log.HEADING, "*".repeat(Transpay.account.getPIN().length()), true);
 
+        new TypeWriter(Log.BODY, "Created at: ", false);
+        new FlashWriter(Log.HEADING, Transpay.account.getDateRegistered(), true);
+
         new TypeWriter(Log.SYSTEM, "\n\nOptions", true);  
 
         new TypeWriter(Log.OPTION, "1. ", false);
@@ -93,7 +96,7 @@ public class AccountDetail {
         while (true) {
             new FlashWriter(Log.HEADING, "\t\t    Your Transaction History\n", true);
     
-            Transaction[] transactions = Transpay.bankSystem.getTransactionsByAccount(Transpay.account.getAccountNumber());
+            Transaction[] transactions = Transpay.bankSystem.getTransactionsByAccountByDateDESC(Transpay.account.getAccountNumber());
     
             if (transactions.length == 0) {
                 new FlashWriter(Log.INFO, "No transactions found.", true);
@@ -106,7 +109,7 @@ public class AccountDetail {
                     new TypeWriter(Log.BODY, "Transaction Type: ", false);
                     new FlashWriter(Log.HEADING, transaction.getType(), true);
     
-                    if (transaction.getTarget() != null) {
+                    if (transaction.getType().equals("Transfer")) {
                         if (transaction.getTransferType().equals("Receiver")) {
                             new TypeWriter(Log.BODY, "Sender Account: ", false);
                             new FlashWriter(
@@ -131,17 +134,15 @@ public class AccountDetail {
                                     "*".repeat(transaction.getTarget().length() - 3)),
                          true);
 
-                            new TypeWriter(Log.ERROR, "-", false);
+                            new TypeWriter(Log.ERROR, "\t-", false);
                         }
                     }
-    
-                    ConsoleLog.print("\t");
 
                     if (transaction.getType().equals("Withdrawal")) {
-                        new TypeWriter(Log.ERROR, "-", false);
+                        new TypeWriter(Log.ERROR, "\t-", false);
                     }
                     else if (transaction.getType().equals("Deposit")) {
-                        new TypeWriter(Log.SUCCESS, "+", false);
+                        new TypeWriter(Log.SUCCESS, "\t+", false);
                     }
 
                     new TypeWriter(Log.BODY, "  PHP ", false);
@@ -167,6 +168,10 @@ public class AccountDetail {
     }
 
     private void viewStatementOfAccount() {
+        new FlashWriter(Log.HEADING, "\t\t    Set Statement of Account Date\n", true);
+
+        new TypeWriter(Log.BODY, "    If going here was a mistake, use 'exit' command\n", true);
+
         new FlashWriter(Log.INPUT, "Enter the year range (YYYY):", true);
         String year = getYear();
 
@@ -182,7 +187,18 @@ public class AccountDetail {
             startMonth,
             endMonth
         );
-        double startingBalance = transactions[0].getAccountBalance() + transactions[0].getAmount();
+
+        if (transactions.length == 0) {
+            new FlashWriter(Log.INFO, "\nNo transactions found.\n", true);
+            returnToAccountDetail();
+            return;
+        }
+
+        double startingBalance = (transactions[0].getType().equals("Transfer") && 
+            transactions[0].getTransferType().equals("Receiver")) || 
+            transactions[0].getType().equals("Deposit") ? 
+            transactions[0].getAccountBalance() - transactions[0].getAmount() : 
+            transactions[0].getAccountBalance() + transactions[0].getAmount();
 
         double paidOutBalance = 0;
         double paidInBalance = 0;
@@ -227,78 +243,72 @@ public class AccountDetail {
             year + 
             " to 01 " + 
             Month.of(Integer.parseInt(endMonth)).getDisplayName(TextStyle.FULL_STANDALONE, Locale.ENGLISH) + " " +  
-            (endMonth.equals("January") ? String.valueOf(Integer.parseInt(year) + 1) : year), 
+            ((Integer.parseInt(endMonth) < 12 || Integer.parseInt(startMonth) == Integer.parseInt(endMonth)) ? String.valueOf(Integer.parseInt(year) + 1) : year), 
             true);
 
-        new FlashWriter(Log.SYSTEM, "\n\t\t Starting Balance: PHP ", false);
+        new FlashWriter(Log.SYSTEM, "\n\t Starting Balance: PHP ", false);
         new FlashWriter(Log.HEADING, String.format("%,.2f", startingBalance), true);
 
-        new FlashWriter(Log.SYSTEM, "\t\t Paid In: PHP ", false);
+        new FlashWriter(Log.SYSTEM, "\t Paid In: PHP ", false);
         new FlashWriter(Log.HEADING, String.format("%,.2f", paidInBalance), true);
 
-        new FlashWriter(Log.SYSTEM, "\t\t Paid Out: PHP ", false);
+        new FlashWriter(Log.SYSTEM, "\t Paid Out: PHP ", false);
         new FlashWriter(Log.HEADING, String.format("%,.2f", paidOutBalance), true);
 
-        new FlashWriter(Log.SYSTEM, "\t\t Ending Balance: PHP ", false);
+        new FlashWriter(Log.SYSTEM, "\t Ending Balance: PHP ", false);
         new FlashWriter(Log.HEADING, String.format("%,.2f", startingBalance + paidInBalance - paidOutBalance), true);
 
-        if (transactions.length == 0) {
-            new FlashWriter(Log.INFO, "\nNo transactions found.\n", true);
-        }
+        new FlashWriter(Log.INFO, String.format(
+    "\n%-15s %-12s %-30s %15s %20s\n", 
+    "Date", "Type", "Description", "Cash Flow", "Real-time Balance"), true);
 
-        else {
-            new FlashWriter(Log.INFO, String.format(
-        "\n%-15s %-12s %-30s %15s %20s\n", 
-        "Date", "Type", "Description", "Cash Flow", "Real-time Balance"), true);
+        new FlashWriter(Log.INFO, String.format(
+    "%-15s %-12s %-30s %15s %20s", 
+            "-".repeat(15), "-".repeat(12), "-".repeat(30), "-".repeat(15), "-".repeat(20)
+        ), true);
 
-            new FlashWriter(Log.INFO, String.format(
-        "%-15s %-12s %-30s %15s %20s", 
-                "-".repeat(15), "-".repeat(12), "-".repeat(30), "-".repeat(15), "-".repeat(20)
-            ), true);
+        for (Transaction transaction : transactions) {
+            String[] date = transaction.getDate().split("-");
+            String formattedDate = String.format("%s %s %s", date[2].split(" ")[0], 
+                Month.of(Integer.parseInt(date[1])).getDisplayName(TextStyle.FULL_STANDALONE, Locale.ENGLISH), 
+                date[0]);
 
-            for (Transaction transaction : transactions) {
-                String[] date = transaction.getDate().split("-");
-                String formattedDate = String.format("%s %s %s", date[2].split(" ")[0], 
-                    Month.of(Integer.parseInt(date[1])).getDisplayName(TextStyle.FULL_STANDALONE, Locale.ENGLISH), 
-                    date[0]);
+            String description;
+            if (transaction.getTarget() != null) {
+                String maskedTarget = transaction.getTarget().replace(
+                    transaction.getTarget().substring(1, transaction.getTarget().length() - 3),
+                    "*".repeat(transaction.getTarget().length() - 3));
 
-                String description;
-                if (transaction.getTarget() != null) {
-                    String maskedTarget = transaction.getTarget().replace(
-                        transaction.getTarget().substring(1, transaction.getTarget().length() - 3),
-                        "*".repeat(transaction.getTarget().length() - 3));
-
-                    if (transaction.getTransferType().equals("Receiver")) {
-                        description = "Received from " + maskedTarget;
-                    } else {
-                        description = "Sent to " + maskedTarget;
-                    }
+                if (transaction.getTransferType().equals("Receiver")) {
+                    description = "Received from " + maskedTarget;
                 } else {
-                    description = "-";
+                    description = "Sent to " + maskedTarget;
                 }
-
-                if (description.length() > 30) {
-                    description = description.substring(0, 27) + "...";
-                }
-
-                String cashFlow = transaction.getType().equals("Deposit") || transaction.getType().equals("Transfer") && transaction.getTransferType().equals("Receiver") ? 
-                    String.format(ConsoleLog.colorSuccess + "+ " + ConsoleLog.RESET_CODE + "PHP %,.2f", transaction.getAmount()) : 
-                    String.format(ConsoleLog.colorError + "- " + ConsoleLog.RESET_CODE +"PHP %,.2f", transaction.getAmount());
-
-                String balance = String.format("PHP %,.2f", transaction.getAccountBalance());
-
-                new FlashWriter(Log.BODY, String.format(
-                    "%-15s %-12s %-30s %15s %20s", 
-                    formattedDate, 
-                    transaction.getType(), 
-                    description, 
-                    cashFlow, 
-                    balance
-                ), true);
+            } else {
+                description = "-";
             }
-        
-            returnToAccountDetail();
+
+            if (description.length() > 30) {
+                description = description.substring(0, 27) + "...";
+            }
+
+            String cashFlow = transaction.getType().equals("Deposit") || transaction.getType().equals("Transfer") && transaction.getTransferType().equals("Receiver") ? 
+                String.format(ConsoleLog.colorSuccess + "+ " + ConsoleLog.RESET_CODE + "PHP %,.2f", transaction.getAmount()) : 
+                String.format(ConsoleLog.colorError + "- " + ConsoleLog.RESET_CODE +"PHP %,.2f", transaction.getAmount());
+
+            String balance = String.format("PHP %,.2f", transaction.getAccountBalance());
+
+            new FlashWriter(Log.BODY, String.format(
+                "%-15s %-12s %-30s %15s %20s", 
+                formattedDate, 
+                transaction.getType(), 
+                description, 
+                cashFlow, 
+                balance
+            ), true);
         }
+
+        returnToAccountDetail();
     }
     
     private String getYear() {

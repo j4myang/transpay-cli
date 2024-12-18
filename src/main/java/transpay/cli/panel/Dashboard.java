@@ -16,7 +16,7 @@ public class Dashboard {
         new TypeWriter(Log.INPUT, "\nWhat would you like to do?", true);
 
         while (true) {
-            int choice = Integer.parseInt(getValidatedInput("", test -> {
+            int choice = Integer.parseInt(Welcome.getValidatedInput("", test -> {
                 try {
                     if (!test.matches("\\d+")) {
                         throw new NumberFormatException();

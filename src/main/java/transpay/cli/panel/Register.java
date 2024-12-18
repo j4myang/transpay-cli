@@ -130,6 +130,9 @@ public class Register {
 
         new TypeWriter(Log.BODY, "Balance: PHP ", false);
         new FlashWriter(Log.HEADING, String.format("%,.2f", balance), true);
+
+        new TypeWriter(Log.BODY, "Created at: ", false);
+        new FlashWriter(Log.HEADING, Transpay.accountSystem.getAccount(accountNumber).getDateRegistered(), true);
     }
 
     private String registerAccount(String name, String pin, double balance) {
