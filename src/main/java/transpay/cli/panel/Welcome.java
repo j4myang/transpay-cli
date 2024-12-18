@@ -75,7 +75,7 @@ public class Welcome {
                     break;
                 case 3:
                     Transpay.exit = true;
-                    break;
+                    return;
                 case 4:
                     ConsoleLog.clear(0);
                     new Admin();
