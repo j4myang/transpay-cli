@@ -9,8 +9,8 @@ import transpay.cli.components.Greet;
 import transpay.cli.components.Log;
 import transpay.cli.components.TypeWriter;
 
-public class Welcome {
-    public Welcome() {
+public class Start {
+    public Start() {
         new Greet(Transpay.brand.toUpperCase());
 
         new TypeWriter(Log.HEADING, "\t\t    Welcome to " + Transpay.brand + "!", true);
@@ -91,7 +91,7 @@ public class Welcome {
                 String input = isPassword ? ConsoleLog.getPassword() : ConsoleLog.getInput();
                 if (input.equalsIgnoreCase("exit")) {
                     ConsoleLog.clear(0);
-                    new Welcome();
+                    new Start();
                     return null;
                 }
                 if (validator.test(input)) {
@@ -111,7 +111,7 @@ public class Welcome {
                 String input = isPassword ? ConsoleLog.getPassword() : ConsoleLog.getInput();
                 if (input.equalsIgnoreCase("exit")) {
                     ConsoleLog.clear(0);
-                    new Welcome();
+                    new Start();
                     return null;
                 }
 
@@ -137,7 +137,7 @@ public class Welcome {
                 String input = isPassword ? ConsoleLog.getPassword() : ConsoleLog.getInput();
                 if (input.equalsIgnoreCase("exit")) {
                     ConsoleLog.clear(0);
-                    new Welcome();
+                    new Start();
                     return null;
                 }
 
@@ -167,6 +167,6 @@ public class Welcome {
 
         new FlashWriter(Log.INFO, "Returning to Start page...", false);
         ConsoleLog.clear(1000);
-        new Welcome();
+        new Start();
     }
 }

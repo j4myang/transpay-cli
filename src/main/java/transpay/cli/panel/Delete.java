@@ -66,6 +66,6 @@ public class Delete {
         new FlashWriter(Log.INFO, "\nAccount deleted successfully.", true);
 
         ConsoleLog.clear(1000);
-        new Welcome();
+        new Start();
     }
 }

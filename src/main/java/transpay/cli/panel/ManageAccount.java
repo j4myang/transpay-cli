@@ -120,7 +120,7 @@ public class ManageAccount {
         new FlashWriter(Log.INPUT, "\nEnter your PIN to proceed (hidden for security):", true);
 
         while (true) {
-            String pin = Welcome.getValidatedInput(
+            String pin = Start.getValidatedInput(
                 "", 
                 test1 -> test1.matches(Transpay.pinPattern), 
                 test2 -> test2.equals(Transpay.account.getPIN()),

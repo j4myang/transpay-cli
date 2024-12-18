@@ -30,7 +30,7 @@ public class Login {
         new TypeWriter(Log.INPUT, "Enter your account number:", true);
 
         while (true) {
-            String input = Welcome.getValidatedInput(
+            String input = Start.getValidatedInput(
                 "", 
                 test1 -> {
                     return !test1.isBlank();
@@ -53,7 +53,7 @@ public class Login {
         new TypeWriter(Log.INPUT, "\nEnter your 6-digit PIN (hidden for security):", true);
 
         while (true) {
-            String pin = Welcome.getValidatedInput(
+            String pin = Start.getValidatedInput(
                 "", 
                 test1 -> test1.matches(Transpay.pinPattern), 
                 test2 -> test2.equals(Transpay.accountSystem.getAccount(accountNumber).getPIN()),

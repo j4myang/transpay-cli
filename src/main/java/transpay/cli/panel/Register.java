@@ -35,13 +35,13 @@ public class Register {
 
         displaySummary(accountNumber, username, pin, balance);
 
-        Welcome.returnToWelcome();
+        Start.returnToWelcome();
     }
 
 
     private String getUserName() {
         while (true) {
-            String input = Welcome.getValidatedInput(
+            String input = Start.getValidatedInput(
                 "", 
                 test -> {
                     return !test.isBlank();
@@ -59,7 +59,7 @@ public class Register {
         new TypeWriter(Log.INPUT, "\nEnter your 6-digit PIN (hidden for security):", true);
 
         while (true) {
-            String input = Welcome.getValidatedInput(
+            String input = Start.getValidatedInput(
                 "", 
                 test -> {
                     return test.matches(Transpay.pinPattern);
@@ -75,7 +75,7 @@ public class Register {
         new TypeWriter(Log.INPUT, "\nConfirm your 6-digit PIN (hidden for security):", true);
 
         while (true) {
-            String input = Welcome.getValidatedInput(
+            String input = Start.getValidatedInput(
                 "", 
                 test1 -> {
                     return test1.matches(Transpay.pinPattern);
@@ -97,7 +97,7 @@ public class Register {
         new TypeWriter(Log.INPUT, "\nEnter your starting balance (balance limit of 1 million):", true);
 
         while (true) {
-            String input = Welcome.getValidatedInput(
+            String input = Start.getValidatedInput(
                 "PHP ", 
                 test1 -> {
                     return Double.parseDouble(test1) > 0;

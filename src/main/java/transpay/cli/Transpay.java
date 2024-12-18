@@ -6,7 +6,7 @@ import transpay.account.Account;
 import transpay.account.AccountSystem;
 import transpay.bank.BankSystem;
 import transpay.cli.components.ConsoleLog;
-import transpay.cli.panel.Welcome;
+import transpay.cli.panel.Start;
 
 public class Transpay {
     public static String brand = "Transpay";
@@ -36,7 +36,7 @@ public class Transpay {
     public Transpay() {
         while (!exit) {
             status = statuses[new Random().nextInt(statuses.length)];
-            new Welcome();
+            new Start();
         }
         
         scan.close();

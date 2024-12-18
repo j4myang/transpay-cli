@@ -33,7 +33,7 @@ public class Admin {
 
     private String getID() {
         while (true) {
-            String input = Welcome.getValidatedInput(
+            String input = Start.getValidatedInput(
                 "", 
                 test -> {
                     return test.matches("\\d{10}");
@@ -77,7 +77,7 @@ public class Admin {
         new TypeWriter(Log.INPUT, "\nWhat would you like to do?", true);
 
         while (true) {
-            String action = Welcome.getValidatedInput(
+            String action = Start.getValidatedInput(
                 "", 
                 test -> {
                     return Double.parseDouble(test) >= 1 && Double.parseDouble(test) <= 5;
@@ -116,8 +116,9 @@ public class Admin {
                     break;
 
                 case "5":
-                    ConsoleLog.clear(0);
-                    new Welcome();
+                    new FlashWriter(Log.INFO, "Returning to Start page...", false);
+                    ConsoleLog.clear(1000);
+                    new Start();
                     break;
             }
         }
