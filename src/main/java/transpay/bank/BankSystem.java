@@ -40,6 +40,48 @@ public class BankSystem {
         return transactions;
     }
 
+    public Transaction[] getTransactionsByAccountByDateDESC(String accountNumber) {
+        BankTransaction current = head;
+        Transaction[] transactions = new Transaction[0];
+
+        while (current != null) {
+            if (current.getTransaction().getAccount().getAccountNumber().equals(accountNumber)) {
+                Transaction[] newTransactions = new Transaction[transactions.length + 1];
+
+                boolean inserted = false;
+                for (int i = 0, j = 0; i < newTransactions.length; i++) {
+                    if (!inserted && (j == transactions.length || 
+                    current.getTransaction().getDate().compareTo(transactions[j].getDate()) > 0)) {
+                        newTransactions[i] = current.getTransaction();
+                        inserted = true;
+                    } else {
+                        newTransactions[i] = transactions[j++];
+                    }
+                }
+
+                transactions = newTransactions;
+            }
+            current = current.getPointer();
+        }
+
+        return transactions;
+    }
+
+    public Transaction[] getTransactionsByAccountByDateASC(String accountNumber) {
+        Transaction[] descTransactions = getTransactionsByAccountByDateDESC(accountNumber);
+
+        int start = 0;
+        int end = descTransactions.length - 1;
+
+        while (start < end) {
+            Transaction temp = descTransactions[start];
+            descTransactions[start++] = descTransactions[end];
+            descTransactions[end++] = temp;
+        }
+
+        return descTransactions;
+    }
+
     public Transaction[] getAccountTransactionByDateRange(String accountNumber, String year, String startMonth, String endMonth) {
         BankTransaction current = head;
         Transaction[] transactions = new Transaction[0];
@@ -53,10 +95,18 @@ public class BankSystem {
                 if (transactionYear.equals(year) || transactionYear.equals(String.valueOf(Integer.parseInt(year) + 1))) {
                     if (isWithinDateRange(startMonth, endMonth, transactionYear, transactionMonth, year)) {
                         Transaction[] newTransactions = new Transaction[transactions.length + 1];
-                        for (int i = 0; i < transactions.length; i++) {
-                            newTransactions[i] = transactions[i];
+
+                        boolean inserted = false;
+                        for (int i = 0, j = 0; i < newTransactions.length; i++) {
+                            // Compare the dates (oldest to most recent)
+                            if (!inserted && (j == transactions.length || current.getTransaction().getDate().compareTo(transactions[j].getDate()) < 0)) {
+                                newTransactions[i] = current.getTransaction();
+                                inserted = true;
+                            } else {
+                                newTransactions[i] = transactions[j++];
+                            }
                         }
-                        newTransactions[newTransactions.length - 1] = current.getTransaction();
+
                         transactions = newTransactions;
                     }
                 }
@@ -71,8 +121,11 @@ public class BankSystem {
         int start = Integer.parseInt(startMonth);
         int end = Integer.parseInt(endMonth);
         int transaction = Integer.parseInt(transactionMonth);
-    
-        if (start <= end) {
+        
+        if (start == end) {
+            return (transaction >= start && transaction <= 12 && transactionYear.equals(startYear)) || 
+                   (transaction >= 1 && transaction <= end && transactionYear.equals(String.valueOf(Integer.parseInt(startYear) + 1)));
+        } else if (start <= end) {
             return transaction >= start && transaction <= end && transactionYear.equals(startYear);
         } else {
             return (transaction >= start && transaction <= 12 && transactionYear.equals(startYear)) || 
