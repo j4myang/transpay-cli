@@ -87,7 +87,6 @@ public class ManageAccount {
 
     private void changePIN() {
         new FlashWriter(Log.INPUT, "\nEnter your new PIN (hidden for security):", true);
-        String newPIN = "";
 
         while (true) {
             String newPin = Dashboard.getValidatedInput(
@@ -109,7 +108,7 @@ public class ManageAccount {
 
                 ConsoleLog.delay(1000);
 
-                Transpay.account.setPIN(newPIN);
+                Transpay.account.setPIN(newPin);
                 new TypeWriter(Log.SUCCESS, "\nChanged PIN", true);
                 return;
             }
@@ -120,7 +119,7 @@ public class ManageAccount {
         new FlashWriter(Log.INPUT, "\nEnter your PIN to proceed (hidden for security):", true);
 
         while (true) {
-            String pin = Start.getValidatedInput(
+            String pin = Dashboard.getValidatedInput(
                 "", 
                 test1 -> test1.matches(Transpay.pinPattern), 
                 test2 -> test2.equals(Transpay.account.getPIN()),
