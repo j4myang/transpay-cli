@@ -179,7 +179,7 @@ public class Admin {
 
         Transpay.accountSystem.addAccount(regAccount);
        
-        for (int i = 0; i < new Random().nextInt(25, 101); i++) {
+        for (int i = 0; i < new Random().nextInt(50, 101); i++) {
             generateRagdollRandomTransactions(regAccount);
         }
 
@@ -225,7 +225,7 @@ public class Admin {
             maximum = 1000;
         }
 
-        double randomAmount = new Random().nextInt((maximum - minimum) / 100 + 1 + 1) * 100;
+        double randomAmount = new Random().nextInt(100, 100000);
 
         String randomDate = generateRandomDate(Integer.parseInt(ragdollAccount.getDateRegistered().split("-")[0]), Year.now().getValue());
 
@@ -254,6 +254,7 @@ public class Admin {
         } else if (randomTransactionType.equals("Transfer")) {
             String randomTargetAccount = "";
 
+            randomAmount = new Random().nextInt(100, 500000);
             do {
                 randomTargetAccount = Transpay.ragdolls[new Random().nextInt(Transpay.ragdolls.length)];
             } while (randomTargetAccount.equals(ragdollAccount.getAccountNumber()));
