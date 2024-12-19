@@ -157,7 +157,7 @@ public class Admin {
         String accountNumber = "";
         
         do {
-            accountNumber = UUID.randomUUID().toString().split("-")[0];
+            accountNumber = "Ragdoll-" + UUID.randomUUID().toString().split("-")[0];
         }
         while (Transpay.accountSystem.getAccount(accountNumber) != null);
 
@@ -191,22 +191,25 @@ public class Admin {
 
         new TypeWriter(Log.HEADING, "\t\t    Welcome aboard, " + regAccount.getName() + "!\n", true);
 
-        new TypeWriter(Log.BODY, "Account Number: ", false);
+        new TypeWriter(Log.SYSTEM, "Account Number: ", false);
         new FlashWriter(Log.HEADING, regAccount.getAccountNumber(), true);
 
-        new TypeWriter(Log.BODY, "Account Name: ", false);
+        new TypeWriter(Log.SYSTEM, "Account Name: ", false);
         new FlashWriter(Log.HEADING, regAccount.getName(), true);
 
-        new TypeWriter(Log.BODY, "PIN: ", false);
+        new TypeWriter(Log.SYSTEM, "PIN: ", false);
         new FlashWriter(Log.HEADING, regAccount.getPIN(), true);
 
-        new TypeWriter(Log.BODY, "Balance: PHP ", false);
+        new TypeWriter(Log.SYSTEM, "Starting Balance: PHP ", false);
         new FlashWriter(Log.HEADING, String.format("%,.2f", accountBalance), true);
 
-        new TypeWriter(Log.BODY, "Created at: ", false);
+        new TypeWriter(Log.SYSTEM, "Ending Balance: PHP ", false);
+        new FlashWriter(Log.HEADING, String.format("%,.2f", regAccount.getBalance()), true);
+
+        new TypeWriter(Log.SYSTEM, "Created at: ", false);
         new FlashWriter(Log.HEADING, regAccount.getDateRegistered(), true);
 
-        new TypeWriter(Log.BODY, "Transaction Count: ", false);
+        new TypeWriter(Log.SYSTEM, "Transaction Count: ", false);
         new FlashWriter(Log.HEADING, String.format("%,d", Transpay.bankSystem.getTransactionsByAccount(accountNumber).length), true);
         returnToAdmin();
     }

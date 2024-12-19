@@ -104,7 +104,7 @@ public class ManageAccount {
             if (newPin != null) {
                 getUserPIN();
 
-                new FlashWriter(Log.INFO, "Changing PIN...", true);
+                new FlashWriter(Log.INFO, "\nChanging PIN...", true);
 
                 ConsoleLog.delay(1000);
 
